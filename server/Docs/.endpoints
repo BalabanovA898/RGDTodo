@@ -1,0 +1,29 @@
+
+[Authorized] {
+    GET api/users?project-id=$id - return all users participating in the project with id $id
+    GET api/users?id=$id - return user with id $id
+    POST api/users - create a new user
+    PUT api/users/$id - update user with id $id
+    DELETE api/users/$id - delete user with id $id
+}
+
+[Authorized] {
+    POST api/projects - create a new project
+    GET api/projects/user-id=$id - return all projects created by user with id $id or all project where user participates in
+    PUT api/projects/$id - update project with id $id
+    [Only for user who created the project]
+    DELETE api/projects/$id - delete project with id $id
+}
+
+[Authorized] {
+    POST api/project-members/project-id=$proejct_id&user-id=$user_id - add user with id $user_id to project with id $project_id
+    DELETE api/project-members/project-id=$proejct_id&user-id=$user_id - remove user with id $user_id from project with id $project_id
+}
+
+POST api/auth/login - login
+POST api/auth/register - register
+POST api/auth/reset-password - reset password
+POST api/auth/reset-request/$id - confirm reset
+
+[Authorized]
+POST api/auth/logout - logout

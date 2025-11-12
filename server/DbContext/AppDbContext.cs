@@ -11,5 +11,7 @@ namespace server.Models
         public DbSet<User> Users { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectMember> ProjectMembers { get; set; }
+        public DbSet<Session> Sessions { get; set; }
+        public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
     }
 }
