@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using server.DTOs;
+using server.Services;
 
 namespace server.Controllers
 {
@@ -8,10 +8,18 @@ namespace server.Controllers
     [Route("api/[controller]")]
     public class AuthController
     {
+        readonly ISessionService _sessionService;
+        readonly IDbService _dbService;
+
+        public AuthController(ISessionService sessionService, IDbService dbService)
+        {
+            _sessionService = sessionService;
+            _dbService = dbService;
+        }
         [HttpPost]
         public IActionResult Login([FromBody] LoginDTO login)
         {
-            throw new NotImplementedException();
+           throw new NotImplementedException();
         }
 
         [HttpPost]
@@ -32,7 +40,6 @@ namespace server.Controllers
             throw new NotImplementedException();
         }
 
-        [Authorize]
         [HttpPost]
         public IActionResult Logout()
         {
