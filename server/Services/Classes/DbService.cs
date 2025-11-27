@@ -7,7 +7,7 @@ namespace server.Services
     {
         private readonly AppDbContext _context;
 
-        internal DbService(AppDbContext context)
+        public DbService(AppDbContext context)
         {
             _context = context;
         }
@@ -117,20 +117,22 @@ namespace server.Services
             _context.SaveChanges();
             return projectToCreate.Id;
         }
-        public Guid UpdateProject(Guid projectId, UpdateProjectDTO project)
+        public Guid UpdateProject(Guid userId, UpdateProjectDTO project)   
         {
-            var projectToUpdate = _context.Projects.FirstOrDefault(p => p.Id == projectId);
+            var projectToUpdate = _context.Projects.FirstOrDefault(p => p.Id == project.Id);
             if (projectToUpdate == null) throw new Exception("Project not found");
+            if (projectToUpdate.UserId != userId) throw new Exception("Must be owner");
             if (project.Title != null) projectToUpdate.Title = project.Title;
             if (project.Description != null) projectToUpdate.Description = project.Description;
             if (project.Diagram != null) projectToUpdate.Diagram = project.Diagram;
             _context.SaveChanges();
             return projectToUpdate.Id;
         }
-        public void DeleteProject(Guid projectId)
+        public void DeleteProject(Guid userId, Guid projectId)
         {
             var projectToDelete = _context.Projects.FirstOrDefault(p => p.Id == projectId);
             if (projectToDelete == null) throw new Exception("Project not found");
+            if (projectToDelete.UserId != userId) throw new Exception("Must be owner");
             _context.Projects.Remove(projectToDelete);
             _context.SaveChanges();
         }
@@ -177,6 +179,79 @@ namespace server.Services
             var user = _context.Users.FirstOrDefault(u => u.Email == login.Email);
             if (user == null) throw new Exception("User not found");
             return BCrypt.Net.BCrypt.Verify(login.Password, user.HashedPassword);
+        }
+
+        public TaskDTO GetTaskById(Guid id)
+        {
+            var task = _context.Tasks.FirstOrDefault(t => t.Id == id);
+            if (task == null) throw new Exception("Task not found");
+            return new TaskDTO
+            {
+                Title = task.Title,
+                Description = task.Description,
+                Deadline = task.Deadline,
+                ParentId = task.ParentId,
+                ProjectId = task.ProjectId,
+                Status = task.Status
+            };
+        }
+        public TaskDTO[] GetTasksByProjectId(Guid projectId)
+        {
+            var tasks = _context.Tasks.Where(t => t.ProjectId == projectId).ToList();
+            TaskDTO[] tasksDTO = new TaskDTO[tasks.Count];
+            for (int i = 0; i < tasks.Count; i++)
+            {
+                tasksDTO[i] = new TaskDTO
+                {
+                    Title = tasks[i].Title,
+                    Description = tasks[i].Description,
+                    Deadline = tasks[i].Deadline,
+                    ParentId = tasks[i].ParentId,
+                    ProjectId = tasks[i].ProjectId,
+                    Status = tasks[i].Status
+                };
+            }
+            return tasksDTO;
+        }
+        public Guid CreateTask(CreateTaskDTO task)
+        {
+            Models.Task taskToCreate = new Models.Task
+            {
+                Title = task.Title,
+                Description = task.Description ?? "",
+                Deadline = task.Deadline,
+                ParentId = task.ParentId,
+                ProjectId = task.ProjectId,
+                Status = task.Status ?? TaskState.CREATED
+            };
+            _context.Tasks.Add(taskToCreate);
+            _context.SaveChanges();
+            return taskToCreate.Id;
+        }
+
+        public Guid UpdateTask(UpdateTaskDTO task)
+        {
+            var taskToUpdate = _context.Tasks.FirstOrDefault(t => t.Id == task.Id);
+            if (taskToUpdate == null) throw new Exception("Task not found");
+            if (task.Title != null) taskToUpdate.Title = task.Title;
+            if (task.Description != null) taskToUpdate.Description = task.Description;
+            if (task.Deadline != null) taskToUpdate.Deadline = task.Deadline;
+            if (task.Status != null) taskToUpdate.Status = task.Status ?? TaskState.CREATED;
+            _context.SaveChanges();
+            return taskToUpdate.Id;
+        }
+        public void DeleteTask(Guid taskId)
+        {
+            var taskToDelete = _context.Tasks.FirstOrDefault(t => t.Id == taskId);
+            if (taskToDelete == null) throw new Exception("Task not found");
+            var tasksChildren = _context.Tasks.Where(t => t.ParentId == taskId).ToList();
+            _context.Tasks.Remove(taskToDelete);
+            while (tasksChildren.Count > 0)
+            {
+                tasksChildren.AddRange(_context.Tasks.Where(t => t.ParentId == tasksChildren[0].Id));
+                _context.Tasks.Remove(tasksChildren[0]);
+            }
+            _context.SaveChanges();
         }
     }
 }

@@ -6,7 +6,7 @@ namespace server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController
+    public class AuthController : Controller
     {
         readonly ISessionService _sessionService;
         readonly IDbService _dbService;
@@ -19,13 +19,24 @@ namespace server.Controllers
         [HttpPost]
         public IActionResult Login([FromBody] LoginDTO login)
         {
-           throw new NotImplementedException();
+            if (_dbService.ValidatePassword(login))
+            {
+                var session = _sessionService.CreateSession();
+                return Ok(session);
+            }
+            return Unauthorized();
         }
 
         [HttpPost]
         public IActionResult Register([FromBody] LoginDTO register)
         {
-            throw new NotImplementedException();
+            CreateUserDTO user = new CreateUserDTO
+            {
+                Email = register.Email,
+                Password = register.Password
+            };
+            _dbService.CreateUser(user);
+            return Ok(_sessionService.CreateSession());
         }
 
         [HttpPost]
@@ -34,16 +45,21 @@ namespace server.Controllers
             throw new NotImplementedException();
         }
 
-        [HttpPost("{id}")]
+        [HttpPost]
         public IActionResult ResetRequest([FromQuery] Guid id)
         {
             throw new NotImplementedException();
         }
 
         [HttpPost]
-        public IActionResult Logout()
+        public IActionResult Logout([FromQuery]Guid sessionId)
         {
-            throw new NotImplementedException();
+            try {
+                _sessionService.DeleteSession(sessionId);
+                return Ok();
+            } catch (Exception e) {
+                return Unauthorized(e.Message);
+            }
         }
     }
 }

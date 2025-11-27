@@ -6,7 +6,7 @@ namespace server.Services
     {
         private readonly AppDbContext _context;
 
-        internal SessionService(AppDbContext context)
+        public SessionService(AppDbContext context)
         {
             _context = context;
         }

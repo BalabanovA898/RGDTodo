@@ -13,5 +13,7 @@ namespace server.Models
         public DbSet<ProjectMember> ProjectMembers { get; set; }
         public DbSet<Session> Sessions { get; set; }
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
+        public DbSet<AssignedToTask> AssignedToTasks { get; set; }
+        public DbSet<Models.Task> Tasks { get; set; }
     }
 }

@@ -1,46 +1,46 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+
 using server.DTOs;
+using Microsoft.AspNetCore.Mvc;
 using server.Services;
 
 namespace server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsersController : Controller
+    public class TaskController: Controller
     {
-        private readonly IDbService _dbService;
         private readonly ISessionService _sessionService;
-        public UsersController(IDbService dbService, ISessionService sessionService)
+        private readonly IDbService _dbService;
+        public TaskController(IDbService dbService, ISessionService sessionService)
         {
-            _dbService = dbService;
+            _dbService = dbService;   
             _sessionService = sessionService;
         }
 
         [HttpGet]
-        public IActionResult GetUserById([FromQuery(Name = "id")] Guid Id)
+        public IActionResult GetProjectTasks([FromQuery(Name = "project-id")] Guid projectId)
         {
-            var authorization = Guid.Parse(Request.Headers["Authorization"]);
+            Guid authorization = Guid.Parse(Request.Headers["Authorization"]);
             if (!_sessionService.ValidateSession(authorization))
                 return Unauthorized();
             try {
-                var user = _dbService.GetUserById(Id);
-                return Ok(user);
+                var tasks = _dbService.GetTasksByProjectId(projectId);
+                return Ok(tasks);
             } catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
         }
-
-        [HttpGet]
-        public IActionResult GetUsersByProjectId([FromQuery(Name = "project-id")] Guid projectId)
+        
+        [HttpPost]
+        public IActionResult CreateTask([FromBody] CreateTaskDTO task)
         {
-            var authorization = Guid.Parse(Request.Headers["Authorization"]);
+            Guid authorization = Guid.Parse(Request.Headers["Authorization"]);
             if (!_sessionService.ValidateSession(authorization))
                 return Unauthorized();
             try {
-                var users = _dbService.GetProjectMembers(projectId);
-                return Ok(users);
+                var taskId = _dbService.CreateTask(task);
+                return Ok(taskId);
             } catch (Exception e)
             {
                 return BadRequest(e.Message);
@@ -48,14 +48,14 @@ namespace server.Controllers
         }
 
         [HttpPut]
-        public IActionResult UpdateUser([FromQuery(Name = "id")] Guid userId, [FromBody] UpdateUserDTO user)
+        public IActionResult UpdateTask([FromBody] UpdateTaskDTO task)
         {
-            var authorization = Guid.Parse(Request.Headers["Authorization"]);
+            Guid authorization = Guid.Parse(Request.Headers["Authorization"]);
             if (!_sessionService.ValidateSession(authorization))
                 return Unauthorized();
             try {
-                var res = _dbService.UpdateUser(userId, user);
-                return Ok(res);
+                var taskId = _dbService.UpdateTask(task);
+                return Ok(taskId);
             } catch (Exception e)
             {
                 return BadRequest(e.Message);
@@ -63,13 +63,13 @@ namespace server.Controllers
         }
 
         [HttpDelete]
-        public IActionResult DeleteUser([FromQuery(Name = "id")] Guid Id)
+        public IActionResult DeleteTask([FromQuery(Name = "id")] Guid taskId)
         {
-            var authorization = Guid.Parse(Request.Headers["Authorization"]);
+            Guid authorization = Guid.Parse(Request.Headers["Authorization"]);
             if (!_sessionService.ValidateSession(authorization))
                 return Unauthorized();
             try {
-                _dbService.DeleteUser(Id);
+                _dbService.DeleteTask(taskId);
                 return Ok();
             } catch (Exception e)
             {
