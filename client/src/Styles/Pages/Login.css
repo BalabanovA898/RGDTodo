@@ -1,0 +1,6 @@
+.auth__text {
+    font-size: 42px;
+    color: var(--text-color);
+    margin-bottom: 16px;
+    text-shadow: 1px 1px 5px #ffffff88;
+}

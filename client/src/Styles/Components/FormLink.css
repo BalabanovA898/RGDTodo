@@ -1,0 +1,10 @@
+.form__link {
+    color: var(--link-color);
+    font-size: 18px;
+}
+
+.link__container {
+    width: 100%;
+    text-align: right;
+    margin-top: 16px;
+}

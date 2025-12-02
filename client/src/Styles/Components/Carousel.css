@@ -1,0 +1,46 @@
+
+.carousel__container {
+    display: flex;
+    height: 35vh;
+    border-top: solid 1px var(--border-color);
+    border-bottom: solid 1px var(--border-color);
+    margin-top: 5vh;
+    gap: 40px;
+    padding: 4vh;
+}
+
+.carousel__controls-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 32px;
+    border: solid 1px var(--border-color);
+    padding-inline: 15px;
+    animation: normal btn-hover-out .1s;
+}
+
+.carousel__controls-btn:hover {
+    animation: normal btn-hover-in .1s;
+    background: linear-gradient(45deg, #ffffff11, var(--background-color-1));
+}
+
+@keyframes btn-hover-in {
+    0% {
+        background: linear-gradient(45deg, var(--background-color-1));
+    }
+    100% {
+        background: linear-gradient(45deg, #ffffff11, var(--background-color-1));
+    }
+}
+
+@keyframes btn-hover-out {
+    0% {
+        background: linear-gradient(45deg, #ffffff11, var(--background-color-1));
+    }
+    50% {
+        background: linear-gradient(45deg, var(--background-color-1), #ffffff11);
+    }
+    100% {
+        background: linear-gradient(45deg, var(--background-color-1));
+    }
+}

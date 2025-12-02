@@ -1,0 +1,23 @@
+
+.not-found__container {
+    width: auto;   
+    margin: auto;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    padding: 40px;
+    text-align: center;
+    background: transparent;
+}
+
+.not-found__image {
+    width:350px;
+    margin: auto;
+}
+
+.not-found__text {
+    font-size: 100px;
+    color: var(--text-color);
+}
+

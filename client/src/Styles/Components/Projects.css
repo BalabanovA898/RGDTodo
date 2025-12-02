@@ -1,0 +1,25 @@
+
+
+.projects__container {
+    backdrop-filter: blur(2px);
+    padding: 5%;
+    z-index: 2000;
+    border: solid 1px var(--border-color);
+    background-color: var(--background-color-1);
+    border-radius: 12px;
+    flex-grow: 15;
+}
+
+.projects__header__container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.projects__header__text {
+    color: var(--text-color);
+    text-shadow: 1px 1px 1px var(--text-color);
+}
+
+.projects__header__btn {
+    max-width: 10%;
+}
