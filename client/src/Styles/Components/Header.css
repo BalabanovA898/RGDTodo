@@ -3,7 +3,6 @@
     backdrop-filter: blur(2px);
     z-index: 2000;
     border: solid 1px var(--border-color);
-    background-color: var(--background-color-1);
     border-radius: 12px;
     display: flex;
     justify-content: space-between;
@@ -12,11 +11,16 @@
 }
 
 .header__btn {
-    max-width: 10%;
+    max-width: 15vh;
     padding: 0;
+    margin-left: 20px;
 }
 
 .header__profile__container {
+    display: flex;
+}
+
+.header__profile-picture__container {
     display: flex;
 }
 
@@ -38,6 +42,15 @@
 }
 
 .header__profile__container:hover {
+    cursor: pointer;
+}
+
+.header__logo {
+    color: var(--text-color);
+    text-shadow: 1px 1px 1px var(--text-color);
+}
+
+.header__logo:hover {
     cursor: pointer;
 }
 

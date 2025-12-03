@@ -1,0 +1,46 @@
+
+.todo-info-viewer__container {
+    border: solid 1px var(--border-color);
+    width: 100%;
+    height: 20%;
+    border-radius: 12px;
+    backdrop-filter: blur(200px);
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-color);
+    padding: 30px;
+}
+
+.todo-info-controls-btns {
+    display: flex;
+}
+
+.todo-info-controls-btn {
+    flex-grow: 1;
+    border: none;
+}
+
+.todo-info-controls-btn:hover {
+    cursor: pointer;
+}
+
+.todo-info-controls-btn > img {
+    height: 30px;
+    width: 30px;
+}
+
+#todo-add-btn {
+    background-color:  lightgreen;
+}
+
+#todo-edit-btn {
+    background-color: burlywood;
+}
+
+#todo-assign-btn {
+    background-color: aqua;
+}
+
+#todo-delete-btn {
+    background-color: crimson;
+}

@@ -1,0 +1,1 @@
+export type TaskState = "WIP" | "CREATED" | "CANCELLED" | "DONE";

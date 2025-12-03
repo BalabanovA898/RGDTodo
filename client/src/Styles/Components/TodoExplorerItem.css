@@ -1,0 +1,11 @@
+.todo-explorer-item__container {
+    color: var(--text-color);
+    border-bottom: solid 1px var(--border-color);
+    padding: 5px;
+    text-overflow: clip;
+}
+
+.todo-explorer-item__children {
+    margin-left: 6px;
+    border-left: solid 1px var(--border-color);
+}

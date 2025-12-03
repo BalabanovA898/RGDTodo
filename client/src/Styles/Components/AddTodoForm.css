@@ -1,0 +1,11 @@
+.add-child-form-container {
+    width: 500px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.add-child-form_buttons {
+    display: flex;
+    gap: 30px;
+}

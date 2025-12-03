@@ -3,7 +3,7 @@ import "../Styles/Components/Input.css"
 
 interface Props {
     placeholder?: string;
-    onChange: (arg: string) => void;
+    onChange: (arg: any) => void;
     type?: string;
 }
 

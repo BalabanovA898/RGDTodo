@@ -1,0 +1,8 @@
+
+.todo-explorer__container {
+    border: solid 1px var(--border-color);
+    width: 20%;
+    height: 100%;
+    border-radius: 12px;
+    backdrop-filter: blur(200px);
+}
