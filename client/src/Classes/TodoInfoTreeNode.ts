@@ -46,4 +46,16 @@ export default class TodoInfoTreeNode {
             return undefined;
         }
     }
+
+    deleteTodo (id: string) {
+        if (this.children) {
+            for (let item of this.children) {
+                if (item.value.id === id) {
+                    this.children = this.children.filter(i => i.value.id !== id);
+                    return;
+                }
+            }
+            this.children.forEach(item => item.deleteTodo(id));
+        }
+    }
 }

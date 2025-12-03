@@ -9,6 +9,8 @@ import Todo from "../Classes/Todo"
 import { nodeModuleNameResolver } from "typescript"
 import { Modal } from "../Components/Modal"
 import { AddTodoForm } from "../Components/AddTodoForm"
+import User from "../Classes/User"
+import { ManageUsersModal } from "../Components/ManageUsersModal"
 
 
 export const ProjectTodos = () => {
@@ -22,6 +24,14 @@ export const ProjectTodos = () => {
 
     const [isAddChildModalActive, setAddChildModalActive] = useState<boolean>(false);
 
+    const [users, setUsers] = useState<User[]>([new User(
+        "1",
+        "Andrey Balabanov",
+        ["Frontend", "Backend", "Fullstack"]
+    )]);
+
+    const [isManageUsersModalActive, setManageUsersModalActive] = useState<boolean>(false);
+
     function editNode (newNode: Todo) {
         let root_copy = root;
         root_copy.editNodeWithId(newNode.id, newNode);
@@ -30,9 +40,14 @@ export const ProjectTodos = () => {
 
     function addChild (parentId: string, newNode: Todo) {
         let root_copy = root;
-        console.log(newNode);
         root_copy.addChildToNodeWithId(parentId, newNode);
         setRoot(root_copy);
+    }
+
+    function deleteTodo (id: string) {
+       let root_copy = root;
+        root_copy.deleteTodo(id);
+        setRoot(root_copy); 
     }
 
     return <div className="project__todos__container">
@@ -42,6 +57,13 @@ export const ProjectTodos = () => {
         active={isAddChildModalActive} 
         setActive={setAddChildModalActive}
         selectedNode={selectedNode?.value}></AddTodoForm>
+    <ManageUsersModal 
+        active={isManageUsersModalActive}
+        setActive={setManageUsersModalActive}
+        projectUsers={users}
+        todo={selectedNode?.value}
+        editTodo={editNode}
+    ></ManageUsersModal>
     <div className="project__todos__todos__container">
        <TodoExplorer root={root} onTodoSelect={(node) => setSelectedNode(node)}></TodoExplorer> 
        <div className="project__todos__main-part__container">
@@ -51,6 +73,8 @@ export const ProjectTodos = () => {
                 editNode={editNode} 
                 todo={selectedNode?.value}
                 setAddChildModalActive={setAddChildModalActive}
+                deleteTodo={deleteTodo}
+                setManageUsersModalActive={setManageUsersModalActive}
             ></TodoInfoViewer>
        </div>
     </div>

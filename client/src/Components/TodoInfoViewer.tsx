@@ -1,5 +1,5 @@
 
-import { Dispatch, useEffect, useState } from "react";
+import { Dispatch, useEffect, useRef, useState } from "react";
 import "../Styles/Components/TodoInfoViewer.css"
 import Todo from "../Classes/Todo";
 
@@ -13,6 +13,8 @@ interface Props {
     editNode: (newNode: Todo) => void;
     checkTodoToBeDone: (id: string) => boolean | undefined;
     setAddChildModalActive: Dispatch<boolean>;
+    deleteTodo: (id: string) => void;
+    setManageUsersModalActive: Dispatch<boolean>;
 }
 
 export const TodoInfoViewer = (props: Props) => {
@@ -22,6 +24,10 @@ export const TodoInfoViewer = (props: Props) => {
 
     const [newTitle, setNewTitle] = useState<string>(props.todo?.title || "");
     const [newDescription, setNewDescription] = useState<string>(props.todo?.description || "");
+
+    const [newDate, setNewDate] = useState<number>();
+
+    const datePicker = useRef<HTMLInputElement>(null);
 
     return props.todo ? <div className="todo-info-viewer__container"
     onKeyDown={(e) => {
@@ -95,12 +101,26 @@ export const TodoInfoViewer = (props: Props) => {
             }
             </div>
             <div className="todo-info-controls-deadline">
-                <p>{new Date(props.todo.deadline).toDateString()}</p>
+                <input ref={datePicker} type="date" style={{opacity: 0, position: "absolute", right: "30px"}}
+                    onChange={e => {
+                        setNewDate(new Date(e.target.value).getTime());
+                        console.log(newDate)
+                        if (props.todo) {
+                            let newNode = props.todo;
+                            newNode.deadline = newDate || 0;
+                            props.editNode(newNode);
+                        }
+                    }}
+                />
+                <p onClick={() => {
+                    console.log(1);
+                    datePicker.current?.click();
+                }}>{new Date(props.todo.deadline).toDateString()}⏲</p>
             </div>   
             <div className="todo-info-controls-btns">
                 <button id="todo-add-btn" className="todo-info-controls-btn"><img src={plus} alt="Add child" onClick={() => props.setAddChildModalActive(true)}></img></button>
-                <button id="todo-assign-btn" className="todo-info-controls-btn"><img src={person} alt="Manage assigned"></img></button>
-                <button id="todo-delete-btn" className="todo-info-controls-btn"><img src={deleteIcon} alt="Remove todo"></img></button>
+                <button id="todo-assign-btn" className="todo-info-controls-btn" onClick={() => props.setManageUsersModalActive(true)}><img src={person} alt="Manage assigned"></img></button>
+                <button id="todo-delete-btn" className="todo-info-controls-btn"><img src={deleteIcon} alt="Remove todo" onClick={() => props.deleteTodo(props.todo?.id || "")}></img></button>
             </div>
         </div>
     </div> : <div className="todo-info-viewer__container placholder"><p>CLICK ON TODO</p></div>

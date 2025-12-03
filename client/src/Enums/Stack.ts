@@ -1,0 +1,1 @@
+export type Stack = "Frontend" | "Backend" | "Fullstack" | "Mobile" | "Designer";
