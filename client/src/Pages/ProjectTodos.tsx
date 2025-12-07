@@ -45,7 +45,7 @@ export const ProjectTodos = () => {
     }
 
     function deleteTodo (id: string) {
-       let root_copy = root;
+        let root_copy = root;
         root_copy.deleteTodo(id);
         setRoot(root_copy); 
     }

@@ -26,13 +26,14 @@ export const AddTodoForm = (props: Props) => {
             <div className="add-child-form_buttons">
                 <Button onClick={() => props.setActive(false)}>Cancel</Button>
                 <Button onClick={() => {
-                    console.log(props.selectedNode)
+                    if (deadline.getTime() < (props.selectedNode?.deadline || 0))
+                        throw new Error("Wrong deadline");
                     if (props.selectedNode)
                     props.addChild(props.selectedNode.id ,new Todo(
                         Date.now().toString(),
                         title,
                         description,
-                        deadline.getDate(),
+                        deadline.getTime(),
                         "CREATED"
                     ));
                     props.setActive(false);
