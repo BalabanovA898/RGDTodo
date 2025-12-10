@@ -1,17 +1,20 @@
-import React, { useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import TodoInfoTreeNode from "../Classes/TodoInfoTreeNode";
 import "../Styles/Components/TreeDiagram.css";
 
 import Tree from "react-d3-tree";
 
-import * as d3 from "d3";
 import Todo from "../Classes/Todo";
+import { observer } from "mobx-react-lite";
+import { Context } from "..";
 
 interface Props {
     root?: TodoInfoTreeNode;
 }
 
-export const TreeDiagram = (props: Props) => {
+export const TreeDiagram = observer((props: Props) => {
+    const {store} = useContext(Context);
+
     return <div style={{color: "#fff"}} className="tree-diagram__container">
         {props.root && <Tree data={props.root}
             leafNodeClassName="tree__leafs"
@@ -32,16 +35,15 @@ export const TreeDiagram = (props: Props) => {
                 }
                 return <React.Fragment>
                     <circle r={20} 
-                    stroke={value.deadline > Date.now() || value.status === "DONE" ? "none" : "#ff0000"} 
+                    stroke={value.deadline ? new Date(value.deadline).getTime() > new Date().getTime() || value.status === "DONE" ? "none" : "#ff0000" : "none"} 
                     strokeWidth={3} fill={fillColor} paintOrder={"fill"}></circle>
                     <foreignObject width={200} height={200}> 
                         <div style={{ display: "flex", margin: "20px"}}>
-                            <h3 style={{display: "block", width: "100%", fontSize:"12px"}}>{e.nodeDatum.name}</h3>
+                            <h3 style={{display: "block", width: "100%", fontSize:"12px"}}>{value.assigned?.some(item => item.id === store.user.id) && "(YOUR)"}{e.nodeDatum.name}</h3>
                         </div>
                     </foreignObject>
                 </React.Fragment>
             }}
-            onNodeClick={e => console.log(e)}
         ></Tree>}
     </div>
-}
+});

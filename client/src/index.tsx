@@ -9,19 +9,38 @@ import { NotFound } from './Pages/NotFound';
 import "./Styles/global.css";
 import { Register } from './Pages/Register';
 import { Profile } from './Pages/Profile';
+import Store from './store/store';
+import { createContext } from 'react';
+import { InvitationToProject } from './Components/InvitationToProject';
+import { NotificationHandler } from './Components/NotificationHandler';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
+interface IStore {
+  store: Store
+}
+
+const store = new Store();
+
+export const Context = createContext<IStore>({
+  store
+});
+
 root.render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<Login/>}/>
-      <Route path="/project/:id" element={<ProjectTodos></ProjectTodos>}></Route>
-      <Route path="/home" element={<Home></Home>}></Route>
-      <Route path="/register" element={<Register></Register>}></Route>
-      <Route path="/profile" element={<Profile></Profile>}></Route>
-      <Route path="*" element={<NotFound></NotFound>}></Route>
-    </Routes>
-  </BrowserRouter>
+  <Context.Provider value={{store}}>
+    <NotificationHandler></NotificationHandler>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login/>}/>
+        <Route path="/register" element={<Register></Register>}></Route>
+        <Route path="/project/:id" element={<ProjectTodos></ProjectTodos>}></Route>
+        <Route path="/home" element={<Home></Home>}></Route>
+        <Route path="/profile" element={<Profile></Profile>}></Route>
+        <Route path="/share-link/:id" element={<InvitationToProject></InvitationToProject>}></Route> 
+        <Route path="*" element={<NotFound></NotFound>}></Route>
+      </Routes>
+    </BrowserRouter>
+  </Context.Provider>
 );

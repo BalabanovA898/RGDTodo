@@ -24,12 +24,17 @@ export default class TodoInfoTreeNode {
     }
     
     addChildToNodeWithId(id: string, newNode: Todo) {
-        console.log(this);
         if (this.value.id === id) {
             this.children?.push(new TodoInfoTreeNode(newNode, [], this.value.id))
-        } else {
-            this.children?.forEach(item => item.addChildToNodeWithId(id, newNode));
+            return true;
+        } else if (this.children) {
+            let res = false;
+            for (let item of this.children) {
+                res = res || item.addChildToNodeWithId(id, newNode);
+                if (res) return true
+            }
         }
+        return false;
     }
 
     checkTodoToBeDone (id: string): boolean | undefined {

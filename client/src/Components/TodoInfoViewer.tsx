@@ -1,5 +1,5 @@
 
-import { Dispatch, useEffect, useRef, useState } from "react";
+import { Dispatch, useContext, useEffect, useRef, useState } from "react";
 import "../Styles/Components/TodoInfoViewer.css"
 import Todo from "../Classes/Todo";
 
@@ -7,6 +7,9 @@ import plus from "../images/icons/plus.png";
 import edit from "../images/icons/edit.png";
 import deleteIcon from "../images/icons/delete.png";
 import person from "../images/icons/person.png";
+import { observer } from "mobx-react-lite";
+import { Context } from "..";
+import Notification from "../Classes/Notification";
 
 interface Props {
     todo?: Todo;
@@ -17,7 +20,7 @@ interface Props {
     setManageUsersModalActive: Dispatch<boolean>;
 }
 
-export const TodoInfoViewer = (props: Props) => {
+export const TodoInfoViewer = observer((props: Props) => {
     const [statusActive, setStatusActive] = useState<boolean>(false);
     const [isTitleEditing, setTitleEditing] = useState<boolean>(false);
     const [isDescriptionEditing, setDescriptionEditing] = useState<boolean>(false);
@@ -25,9 +28,11 @@ export const TodoInfoViewer = (props: Props) => {
     const [newTitle, setNewTitle] = useState<string>(props.todo?.title || "");
     const [newDescription, setNewDescription] = useState<string>(props.todo?.description || "");
 
-    const [newDate, setNewDate] = useState<number>();
+    const [newDate, setNewDate] = useState<Date>();
 
     const datePicker = useRef<HTMLInputElement>(null);
+
+    const {store} = useContext(Context);
 
     return props.todo ? <div className="todo-info-viewer__container"
     onKeyDown={(e) => {
@@ -41,7 +46,6 @@ export const TodoInfoViewer = (props: Props) => {
             ? <h1 className="todo-info-description-title" onClick={() => setTitleEditing(true)}>{props.todo?.title}</h1> 
             : <input className="todo-info-description-title__edit" value={newTitle} onChange={e => setNewTitle(e.target.value)} onKeyDown={
                 (e) => {
-                    console.log(e.key);
                     if (e.key === 'Enter') {
                         if (props.todo) {
                             let newNode = props.todo;
@@ -53,10 +57,9 @@ export const TodoInfoViewer = (props: Props) => {
                 }
             }></input>}
             { !isDescriptionEditing ?
-                <h2 className="todo-info-description-description" onClick={() => setDescriptionEditing(true)}>{props.todo?.description}</h2>
+                <h2 className="todo-info-description-description" onClick={() => setDescriptionEditing(true)}>{props.todo?.description || "No description"}</h2>
                 : <input className="todo-info-description-title__edit" value={newDescription} onChange={e => setNewDescription(e.target.value)} onKeyDown={
                 (e) => {
-                    console.log(e.key);
                     if (e.key === 'Enter') {
                         if (props.todo) {
                             let newNode = props.todo;
@@ -86,7 +89,7 @@ export const TodoInfoViewer = (props: Props) => {
                                     newNode.status="DONE"
                                     props.editNode(newNode);
                                 } else {
-                                    console.log("You must to do all sub task to do this one");
+                                    store.notifications.push(new Notification("error", "You must to do all sub task to do this one"));
                                 }
                             }
                         }}>DONE</p>
@@ -103,19 +106,17 @@ export const TodoInfoViewer = (props: Props) => {
             <div className="todo-info-controls-deadline">
                 <input ref={datePicker} type="date" style={{opacity: 0, position: "absolute", right: "30px"}}
                     onChange={e => {
-                        setNewDate(new Date(e.target.value).getTime());
-                        console.log(newDate)
+                        setNewDate(new Date(e.target.value));
                         if (props.todo) {
                             let newNode = props.todo;
-                            newNode.deadline = newDate || 0;
+                            newNode.deadline = newDate;
                             props.editNode(newNode);
                         }
                     }}
                 />
                 <p onClick={() => {
-                    console.log(1);
                     datePicker.current?.click();
-                }}>{new Date(props.todo.deadline).toDateString()}⏲</p>
+                }}>{props.todo.deadline ? new Date(props.todo.deadline).toDateString() : "No deadline"}⏲</p>
             </div>   
             <div className="todo-info-controls-btns">
                 <button id="todo-add-btn" className="todo-info-controls-btn"><img src={plus} alt="Add child" onClick={() => props.setAddChildModalActive(true)}></img></button>
@@ -124,4 +125,4 @@ export const TodoInfoViewer = (props: Props) => {
             </div>
         </div>
     </div> : <div className="todo-info-viewer__container placholder"><p>CLICK ON TODO</p></div>
-}
+})

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import TodoInfoTreeNode from "../Classes/TodoInfoTreeNode"
 import { TodoExplorer } from "../Components/TodoExplorer"
 import { TreeDiagram } from "../Components/TreeDiagram"
@@ -6,48 +6,117 @@ import "../Styles/Pages/Project.css"
 import { TodoInfoViewer } from "../Components/TodoInfoViewer"
 import { Header } from "../Components/Header"
 import Todo from "../Classes/Todo"
-import { nodeModuleNameResolver } from "typescript"
-import { Modal } from "../Components/Modal"
 import { AddTodoForm } from "../Components/AddTodoForm"
 import User from "../Classes/User"
 import { ManageUsersModal } from "../Components/ManageUsersModal"
+import { observer } from "mobx-react-lite"
+import { Context } from ".."
+import { useLocation, useNavigate } from "react-router-dom"
+import TodosService from "../services/TodosService"
+import Notification from "../Classes/Notification"
+import UserService from "../services/UserService"
 
 
-export const ProjectTodos = () => {
-    const [root, setRoot] = useState<TodoInfoTreeNode>(new TodoInfoTreeNode(new Todo("1","1", "Some text", Date.now(), "CREATED"), [
-        new TodoInfoTreeNode(new Todo("2","2", "Some text", Date.now(), "CREATED"), [], null),
-        new TodoInfoTreeNode(new Todo("3","3", "Some text", Date.now(), "CREATED"), [], null),
-        new TodoInfoTreeNode(new Todo("4","4", "Some text", Date.now(), "CREATED"), [], null)
-    ], null));
+export const ProjectTodos = observer(() => {
+    const {store} = useContext(Context);
+    
+    const navigate = useNavigate();
+    const projectId = useLocation().pathname.split("/").at(-1);
+   
+    const [projectUsers, setProjectUsers] = useState<User[]>([]);
+
+    useEffect(() => {
+        if (localStorage.getItem("session")) 
+            store.checkAuth().then((res:boolean) => {
+                if (!res) {
+                    store.notifications.push(new Notification("error", "You must log in to get acces to this page"))
+                    navigate("/")
+                }
+            }).then(
+                async () => {
+                    fetchTodos();
+                    const res = await UserService.getProjectUsers(projectId || "");
+                    if (typeof res === "string")
+                        store.notifications.push(new Notification("error", res));
+                    else
+                        setProjectUsers(res.data);
+                }
+            );
+        else {
+            store.notifications.push(new Notification("error", "You must log in to get acces to this page"))
+            navigate("/")
+        }
+    }, []);
+
+    async function fetchTodos () { 
+        if (projectId) {
+            const res = await TodosService.getAllProjectTodos(projectId);
+            if (typeof res === "string")
+                store.notifications.push(new Notification("error", res))
+            else {
+                let todos = res?.data;
+                if (todos) {
+                    const rootNode = todos.find(item => !item.parentId);
+                    if (rootNode) {
+                        const newRoot = new TodoInfoTreeNode(rootNode, [], null);
+                        let nodes = [rootNode.id];
+                        let index = 0;
+                        while (index < nodes.length) {
+                            todos.forEach(todo => {
+                                if (todo.parentId === nodes[index]) {
+                                    newRoot.addChildToNodeWithId(todo.parentId, todo);
+                                    nodes.push(todo.id);
+                                }
+                            });
+                            index += 1;
+                        } 
+                        setRoot(newRoot);
+                    }
+                }
+            }
+        }
+    } 
+
+    const [root, setRoot] = useState<TodoInfoTreeNode>(new TodoInfoTreeNode(new Todo("1","1","CREATED", "", "Some text", undefined, new Date(Date.now())), [], null));
 
     const [selectedNode, setSelectedNode] = useState<TodoInfoTreeNode | undefined>(undefined);
 
     const [isAddChildModalActive, setAddChildModalActive] = useState<boolean>(false);
 
-    const [users, setUsers] = useState<User[]>([new User(
-        "1",
-        "Andrey Balabanov",
-        ["Frontend", "Backend", "Fullstack"]
-    )]);
-
     const [isManageUsersModalActive, setManageUsersModalActive] = useState<boolean>(false);
 
-    function editNode (newNode: Todo) {
+    async function editNode (newNode: Todo) {
+        const res = await TodosService.updateTodo(newNode);
+        if (res) {
+            store.notifications.push(new Notification("error", res));
+            return;
+        }
         let root_copy = root;
         root_copy.editNodeWithId(newNode.id, newNode);
         setRoot(root_copy);
     }
 
-    function addChild (parentId: string, newNode: Todo) {
+    async function addChild (parentId: string, newNode: Todo) {
         let root_copy = root;
-        root_copy.addChildToNodeWithId(parentId, newNode);
-        setRoot(root_copy);
+        let res = await TodosService.addNewTodo(newNode);
+        if (res[0]) {
+            newNode.id = res[1];
+            root_copy.addChildToNodeWithId(parentId, newNode);
+            setRoot(root_copy);
+        }
+        else
+            store.notifications.push(new Notification("error", res[1])); 
     }
 
-    function deleteTodo (id: string) {
+    async function deleteTodo (id: string) {
+        const res = await TodosService.deleteTodo(id);
+        if (res) {
+            store.notifications.push(new Notification("error", res));
+            return;
+        }
         let root_copy = root;
         root_copy.deleteTodo(id);
-        setRoot(root_copy); 
+        setRoot(root_copy);
     }
 
     return <div className="project__todos__container">
@@ -60,7 +129,7 @@ export const ProjectTodos = () => {
     <ManageUsersModal 
         active={isManageUsersModalActive}
         setActive={setManageUsersModalActive}
-        projectUsers={users}
+        projectUsers={projectUsers}
         todo={selectedNode?.value}
         editTodo={editNode}
     ></ManageUsersModal>
@@ -79,4 +148,4 @@ export const ProjectTodos = () => {
        </div>
     </div>
     </div>
-}
+});

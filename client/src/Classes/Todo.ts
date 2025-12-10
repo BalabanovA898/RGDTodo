@@ -4,17 +4,21 @@ import User from "./User";
 export default class Todo {
     public id: string;
     public title: string;
-    public description: string;
-    public deadline: number;
     public status: TaskState;
-    public assigned: User[];
+    public projectId: string;
+    public parentId?: string;
+    public description?: string;
+    public deadline?: Date;
+    public assigned?: User[];
 
-    public constructor (id: string, title: string, description: string, deadline: number, status: TaskState, assigned: User[] = []) {
+    public constructor (id: string, title: string, status: TaskState, projectId: string,  description?: string, parentId?: string, deadline?: Date, assigned?: User[]) {
         this.id = id;
         this.title = title;
+        this.status = status;
+        this.projectId = projectId;
+        this.parentId = parentId;
         this.description = description;
         this.deadline = deadline;
-        this.status = status;
         this.assigned = assigned;
     }
 }

@@ -2,15 +2,16 @@ import { useEffect, useState } from "react";
 import ICarouselItem from "../Interfaces/ICarouselItem"
 import { CarouselItem } from "./CarouselItem";
 import "../Styles/Components/Carousel.css"
+import IProjectDTO from "../models/response/ProjectDTO";
 
 interface Props {
-    items: ICarouselItem[];
+    items: IProjectDTO[];
     maxItemsOnScreen: number;
 }
 
 export const Carousel = (props: Props) => {
     const [currentOffset, setCurrentOffset] = useState<number>(0);
-    const [itemsToShow, setItemsToShow] = useState<ICarouselItem[]>([]);
+    const [itemsToShow, setItemsToShow] = useState<IProjectDTO[]>([]);
     useEffect(() => {
         setItemsToShow(props.items.slice(currentOffset, 
             (currentOffset + props.maxItemsOnScreen)));
@@ -22,10 +23,9 @@ export const Carousel = (props: Props) => {
             <button className="carousel__controls-btn"
             onClick={() => {
                 setCurrentOffset((currentOffset - 1 >= 0 ? currentOffset - 1 : props.items.length - 1)%props.items.length)
-                console.log(currentOffset);
             }}>{"<"}</button>
             {
-            itemsToShow.map(item => <CarouselItem item={item} key={item.id}></CarouselItem>)
+            itemsToShow.map((item, index) => <CarouselItem item={item} key={index}></CarouselItem>)
             }
             <button className="carousel__controls-btn"
              onClick={() => {

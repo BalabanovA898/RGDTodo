@@ -1,10 +1,14 @@
-import { Dispatch, useEffect, useState } from "react";
+import { Dispatch, useContext, useEffect, useState } from "react";
 import { Modal } from "./Modal";
 import User from "../Classes/User";
 import Todo from "../Classes/Todo";
 
 import "../Styles/Components/ManageUsersModal.css"
 import { Button } from "./Button";
+import { observer } from "mobx-react-lite";
+import { Context } from "..";
+import TodosService from "../services/TodosService";
+import Notification from "../Classes/Notification";
 
 interface Props {
     active: boolean;
@@ -14,12 +18,19 @@ interface Props {
     editTodo: (newValue: Todo) => void;
 }
 
-export const ManageUsersModal = (props: Props) => {
-    const [notAssigendUsers, setNotAssignedUsers] = useState<User[]>(props.projectUsers.filter(item => !props.todo?.assigned.some(i => i.id === item.id)));
-    
-    function moveUserFromAssigned(id: string) {
+export const ManageUsersModal = observer((props: Props) => {
+    const [notAssigendUsers, setNotAssignedUsers] = useState<User[]>(props.projectUsers.filter(item => !props.todo?.assigned?.some(i => i.id === item.id)));
+    console.log(notAssigendUsers);
+    const {store} = useContext(Context);
+
+    async function moveUserFromAssigned(id: string) {
+        const res = await TodosService.removeAssignToTodo(id, props?.todo?.id || "");
+        if (res) {
+            store.notifications.push(new Notification("error", res));
+            return
+        }
         let todoCopy = props.todo;
-        let newUser =  todoCopy?.assigned.find(item => item.id === id);
+        let newUser =  todoCopy?.assigned?.find(item => item.id === id);
         if (todoCopy?.assigned) {
             todoCopy.assigned = todoCopy?.assigned.filter(item => item.id !== id);
             props.editTodo(todoCopy);
@@ -30,10 +41,15 @@ export const ManageUsersModal = (props: Props) => {
     }
 
     useEffect(() => {
-        setNotAssignedUsers(props.projectUsers.filter(item => !props.todo?.assigned.some(i => i.id === item.id)));
+        setNotAssignedUsers(props.projectUsers.filter(item => !props.todo?.assigned?.some(i => i.id === item.id)));
     }, [props.todo])
 
-    function moveUserToAssigned(id: string) {
+    async function moveUserToAssigned(id: string) {
+        const res = await TodosService.assignToTodo(id, props?.todo?.id || "");
+        if (res) {
+            store.notifications.push(new Notification("error", res));
+            return
+        }
         let todoCopy = props.todo;
         let newUser = notAssigendUsers.find(item => item.id === id);
         setNotAssignedUsers(notAssigendUsers.filter(item => item.id !== id));
@@ -47,9 +63,12 @@ export const ManageUsersModal = (props: Props) => {
         <div className="todo__users__container">
             <div className="assigned-users">
                 {
-                    props.todo?.assigned.map(user => <div className="user-element">
+                    props.todo?.assigned?.map(user => <div className="user-element">
                         <p>{user.username}</p>
-                        <button className="user-element__btn" onClick={() => moveUserFromAssigned(user.id)}>↓</button>
+                        <button className="user-element__btn" onClick={() => {
+                            console.log(props.todo?.assigned);
+                            moveUserFromAssigned((user as any).id)}
+                        }>↓</button>
                     </div>)
                 }
             </div>
@@ -58,11 +77,13 @@ export const ManageUsersModal = (props: Props) => {
                 {
                     notAssigendUsers.map(user => <div className="user-element">
                         <p>{user.username}</p>
-                        <button className="user-element__btn" onClick={() => moveUserToAssigned(user.id)}>↑</button>
+                        <button className="user-element__btn" onClick={() => {
+                            moveUserToAssigned((user as any).id)}
+                        }>↑</button>
                     </div>)
                 }
             </div>
             <Button onClick={() => props.setActive(false)}>Close</Button>
         </div>
     </Modal>
-}
+})

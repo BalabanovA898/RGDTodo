@@ -13,7 +13,7 @@
     backdrop-filter: blur(200px);
 }
 
-.profile__ppf {
+.profile__proflePicture {
     width: 450px;
     height: 450px;
     border-radius: 50%;
@@ -41,7 +41,7 @@
     display: none;
 }
 
-.profile__ppf::after {
+.profile__proflePicture::after {
     position: absolute;
     left: 0;
     right: 0;
