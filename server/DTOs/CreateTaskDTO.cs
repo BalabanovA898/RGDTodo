@@ -9,6 +9,6 @@ namespace server.DTOs
         public DateTime? Deadline { get; set; }
         public Guid? ParentId { get; set; }
         public Guid ProjectId { get; set; }
-        public TaskState? Status { get; set; }
+        public string? Status { get; set; }
     }    
 }

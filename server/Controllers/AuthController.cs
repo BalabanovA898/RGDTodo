@@ -15,18 +15,23 @@ namespace server.Controllers
         {
             _sessionService = sessionService;
             _dbService = dbService;
+        
         }
+
+        [Route("login")]
         [HttpPost]
         public IActionResult Login([FromBody] LoginDTO login)
         {
             if (_dbService.ValidatePassword(login))
             {
-                var session = _sessionService.CreateSession();
-                return Ok(session);
+                var user = _dbService.GetUserByEmail(login.Email);
+                var session = _sessionService.CreateSession(user.Id);
+                return Ok(new {session = session, userDTO = user});
             }
             return Unauthorized();
         }
 
+        [Route("register")]
         [HttpPost]
         public IActionResult Register([FromBody] LoginDTO register)
         {
@@ -35,31 +40,43 @@ namespace server.Controllers
                 Email = register.Email,
                 Password = register.Password
             };
-            _dbService.CreateUser(user);
-            return Ok(_sessionService.CreateSession());
+            var userId = _dbService.CreateUser(user);
+
+            return Ok(new {
+                session = _sessionService.CreateSession(_dbService.GetUserByEmail(user.Email).Id),
+                user = _dbService.GetUserById(userId)
+            } );
         }
 
+        [Route("logout")]
         [HttpPost]
-        public IActionResult ResetPassword([FromBody] ResetPasswordDTO reset)
+        public IActionResult Logout()
         {
-            throw new NotImplementedException();
-        }
-
-        [HttpPost]
-        public IActionResult ResetRequest([FromQuery] Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        [HttpPost]
-        public IActionResult Logout([FromQuery]Guid sessionId)
-        {
+            Guid authorization = Guid.Parse(Request.Headers["Authorization"]);
+            if (!_sessionService.ValidateSession(authorization))
+                return Unauthorized();
             try {
-                _sessionService.DeleteSession(sessionId);
+                _sessionService.DeleteSession(authorization);
                 return Ok();
             } catch (Exception e) {
                 return Unauthorized(e.Message);
             }
+        }
+
+        [Route("refresh")]
+        [HttpGet]
+        public IActionResult Refresh ()
+        {
+            Guid authorization = Guid.Parse(Request.Headers["Authorization"]);
+            if (!_sessionService.ValidateSession(authorization))
+                return Unauthorized();
+            var id = _sessionService.GetSessionUserId(authorization);
+            if (id != null)
+                return Ok(new {
+                    session = authorization, 
+                    userDTO = _dbService.GetUserById(id ?? Guid.NewGuid())
+                });
+            return Unauthorized();
         }
     }
 }

@@ -7,6 +7,7 @@ namespace server.Models
         required public string Username { get; set; }
         required public string HashedPassword { get; set; }
         required public string[] Stacks { get; set; }
-        required public byte[] ProfilePicture { get; set; }
+        required public string ProfilePicture { get; set; }
     }
+    
 }

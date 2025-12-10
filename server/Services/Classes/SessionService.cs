@@ -1,3 +1,4 @@
+using server.DTOs;
 using server.Models;
 
 namespace server.Services
@@ -10,11 +11,12 @@ namespace server.Services
         {
             _context = context;
         }
-        public Guid CreateSession()
+        public Guid CreateSession(Guid userId)
         {
             var session = new Session
             {
-                Expires = DateTime.UtcNow.AddDays(1).ToUniversalTime()
+                Expires = DateTime.UtcNow.AddDays(1).ToUniversalTime(),
+                UserId = userId
             };
             _context.Sessions.Add(session);
             _context.SaveChanges();
@@ -25,6 +27,13 @@ namespace server.Services
         {
             var session = _context.Sessions.FirstOrDefault(s => s.Id == sessionId);
             return session != null && session.Expires > DateTime.UtcNow;
+        }
+
+        public Guid? GetSessionUserId (Guid sessionId)
+        {
+            var userId = _context.Sessions.FirstOrDefault(s => s.Id == sessionId);
+            if (userId != null) return userId.UserId;
+            else return null;
         }
 
         public void DeleteSession(Guid sessionId)

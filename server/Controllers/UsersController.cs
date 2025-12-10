@@ -18,21 +18,6 @@ namespace server.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetUserById([FromQuery(Name = "id")] Guid Id)
-        {
-            var authorization = Guid.Parse(Request.Headers["Authorization"]);
-            if (!_sessionService.ValidateSession(authorization))
-                return Unauthorized();
-            try {
-                var user = _dbService.GetUserById(Id);
-                return Ok(user);
-            } catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
-
-        [HttpGet]
         public IActionResult GetUsersByProjectId([FromQuery(Name = "project-id")] Guid projectId)
         {
             var authorization = Guid.Parse(Request.Headers["Authorization"]);

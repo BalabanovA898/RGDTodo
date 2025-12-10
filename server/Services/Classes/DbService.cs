@@ -1,3 +1,4 @@
+using Microsoft.VisualBasic;
 using server.DTOs;
 using server.Models;
 
@@ -6,6 +7,32 @@ namespace server.Services
     public class DbService : IDbService
     {
         private readonly AppDbContext _context;
+
+        private string TaskStateToString (TaskState value)
+        {
+            switch (value) {
+                case TaskState.CREATED:
+                    return "CREATED";
+                case TaskState.CANCELLED:
+                    return "CANCELLED";
+                case TaskState.DONE:
+                    return "DONE";
+            }   
+            return "WIP";
+        }
+
+        private TaskState TaskStateFromString (string value)
+        {
+            switch (value) {
+                case "WIP":
+                    return TaskState.WIP;
+                case "CANCELLED":
+                    return TaskState.CANCELLED;
+                case "DONE":
+                    return TaskState.DONE;
+            }   
+            return TaskState.CREATED;
+        }
 
         public DbService(AppDbContext context)
         {
@@ -45,7 +72,7 @@ namespace server.Services
                 Email = user.Email,
                 HashedPassword = BCrypt.Net.BCrypt.HashPassword(user.Password),
                 Stacks = [],
-                ProfilePicture = []
+                ProfilePicture = ""
             };
 
             _context.Users.Add(userToCreate);
@@ -56,6 +83,7 @@ namespace server.Services
         {
             var userToUpdate = _context.Users.FirstOrDefault(u => u.Id == userId);
             if (userToUpdate == null) throw new Exception("User not found");
+            Console.WriteLine(user.ProfilePicture);
             if (user.Email != null) userToUpdate.Email = user.Email;
             if (user.Username != null) userToUpdate.Username = user.Username;
             if (user.Stacks != null) userToUpdate.Stacks = user.Stacks;
@@ -80,14 +108,13 @@ namespace server.Services
                 Id = project.Id,
                 Title = project.Title,
                 Description = project.Description,
-                Diagram = project.Diagram,
                 UserId = project.UserId
             };
         }
         public ProjectDTO[] GetProjectsByUserId(Guid userId)
         {
             var projects = _context.Projects.Where(p => p.UserId == userId).ToList();
-            var usersProjects = _context.ProjectMembers.Where(pm => pm.UserId == userId);
+            var usersProjects = _context.ProjectMembers.Where(pm => pm.UserId == userId).ToArray();
             foreach (var project in usersProjects)
             {
                 var userProject = _context.Projects.FirstOrDefault(p => p.Id == project.ProjectId);
@@ -99,7 +126,6 @@ namespace server.Services
                 Id = p.Id,
                 Title = p.Title,
                 Description = p.Description,
-                Diagram = p.Diagram,
                 UserId = p.UserId
             }).ToArray();
         }
@@ -109,7 +135,6 @@ namespace server.Services
             {
                 Title = project.Title,
                 Description = project.Description,
-                Diagram = project.Diagram,
                 UserId = project.UserId
             };
 
@@ -124,7 +149,6 @@ namespace server.Services
             if (projectToUpdate.UserId != userId) throw new Exception("Must be owner");
             if (project.Title != null) projectToUpdate.Title = project.Title;
             if (project.Description != null) projectToUpdate.Description = project.Description;
-            if (project.Diagram != null) projectToUpdate.Diagram = project.Diagram;
             _context.SaveChanges();
             return projectToUpdate.Id;
         }
@@ -134,12 +158,19 @@ namespace server.Services
             if (projectToDelete == null) throw new Exception("Project not found");
             if (projectToDelete.UserId != userId) throw new Exception("Must be owner");
             _context.Projects.Remove(projectToDelete);
+            var tasksToDelete = _context.Tasks.Where(t => t.ProjectId == projectId).ToArray();
+            foreach (var item in tasksToDelete)
+            {
+                var assigmentsToRemove = _context.AssignedToTasks.Where(a => a.TaskId == item.Id);
+                _context.RemoveRange(assigmentsToRemove);
+            }
+            _context.Tasks.RemoveRange(tasksToDelete);
             _context.SaveChanges();
         }
         public UserDTO[] GetProjectMembers(Guid projectId)
         {
             List<UserDTO> users = [];
-            var usersWhoParticipated = _context.ProjectMembers.Where(p => p.ProjectId == projectId);
+            var usersWhoParticipated = _context.ProjectMembers.Where(p => p.ProjectId == projectId).ToArray();
             foreach (var user in usersWhoParticipated)
             {
                 var projectMember = _context.Users.FirstOrDefault(p => p.Id == user.UserId);
@@ -158,6 +189,9 @@ namespace server.Services
 
         public void AddProjectMember(Guid projectId, Guid userId)
         {
+            var project = _context.Projects.FirstOrDefault(p => p.Id == projectId);
+            if (project.UserId == userId) 
+                throw new Exception("There'no reason to invite yorself.");
             var projectMember = new ProjectMember
             {
                 ProjectId = projectId,
@@ -180,35 +214,33 @@ namespace server.Services
             if (user == null) throw new Exception("User not found");
             return BCrypt.Net.BCrypt.Verify(login.Password, user.HashedPassword);
         }
-
-        public TaskDTO GetTaskById(Guid id)
-        {
-            var task = _context.Tasks.FirstOrDefault(t => t.Id == id);
-            if (task == null) throw new Exception("Task not found");
-            return new TaskDTO
-            {
-                Title = task.Title,
-                Description = task.Description,
-                Deadline = task.Deadline,
-                ParentId = task.ParentId,
-                ProjectId = task.ProjectId,
-                Status = task.Status
-            };
-        }
         public TaskDTO[] GetTasksByProjectId(Guid projectId)
         {
             var tasks = _context.Tasks.Where(t => t.ProjectId == projectId).ToList();
             TaskDTO[] tasksDTO = new TaskDTO[tasks.Count];
             for (int i = 0; i < tasks.Count; i++)
             {
+                Console.WriteLine(tasks[i].Id);
+                var AssignedUsers = _context.Users.Where(u => _context.AssignedToTasks.Any(at => at.TaskId == tasks[i].Id && at.UserId == u.Id));
+                var AssignedUsersDTO = AssignedUsers.Select(i => new UserDTO
+                {
+                    Id = i.Id,
+                    Username = i.Username,
+                    Email =  i.Email,
+                    ProfilePicture = i.ProfilePicture,
+                    Stacks = i.Stacks
+                }).ToArray();
+
                 tasksDTO[i] = new TaskDTO
                 {
+                    Id = tasks[i].Id,
                     Title = tasks[i].Title,
                     Description = tasks[i].Description,
                     Deadline = tasks[i].Deadline,
                     ParentId = tasks[i].ParentId,
                     ProjectId = tasks[i].ProjectId,
-                    Status = tasks[i].Status
+                    Status = TaskStateToString(tasks[i].Status),
+                    Assigned = AssignedUsersDTO
                 };
             }
             return tasksDTO;
@@ -222,7 +254,7 @@ namespace server.Services
                 Deadline = task.Deadline,
                 ParentId = task.ParentId,
                 ProjectId = task.ProjectId,
-                Status = task.Status ?? TaskState.CREATED
+                Status = TaskStateFromString(task.Status)
             };
             _context.Tasks.Add(taskToCreate);
             _context.SaveChanges();
@@ -236,7 +268,7 @@ namespace server.Services
             if (task.Title != null) taskToUpdate.Title = task.Title;
             if (task.Description != null) taskToUpdate.Description = task.Description;
             if (task.Deadline != null) taskToUpdate.Deadline = task.Deadline;
-            if (task.Status != null) taskToUpdate.Status = task.Status ?? TaskState.CREATED;
+            if (task.Status != null) taskToUpdate.Status = TaskStateFromString(task.Status);
             _context.SaveChanges();
             return taskToUpdate.Id;
         }
@@ -250,7 +282,23 @@ namespace server.Services
             {
                 tasksChildren.AddRange(_context.Tasks.Where(t => t.ParentId == tasksChildren[0].Id));
                 _context.Tasks.Remove(tasksChildren[0]);
+                tasksChildren.RemoveAt(0);
             }
+            _context.SaveChanges();
+        }
+
+        public void AssignToTask (Guid taskId, Guid userId)
+        {
+            var taskToAsignTo = _context.Tasks.FirstOrDefault(t => t.Id == taskId);   
+            if (taskToAsignTo == null) throw new Exception("Task not found");
+            _context.AssignedToTasks.Add(new AssignedToTask{TaskId = taskId, UserId = userId});
+            _context.SaveChanges();
+        }
+        public void RemoveAssignToTask (Guid taskId, Guid userId)
+        {
+            var taskToAsignTo = _context.AssignedToTasks.FirstOrDefault(t => t.TaskId == taskId && t.UserId == userId);   
+            if (taskToAsignTo == null) throw new Exception("Assigment not found");
+            _context.AssignedToTasks.Remove(taskToAsignTo);
             _context.SaveChanges();
         }
     }

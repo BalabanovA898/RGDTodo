@@ -76,5 +76,34 @@ namespace server.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpPost("assign")]
+        public IActionResult AssignToTask ([FromQuery(Name="user-id")] Guid userId, [FromQuery(Name="task-id")] Guid taskId)
+        {
+            Guid authorization = Guid.Parse(Request.Headers["Authorization"]);
+            if (!_sessionService.ValidateSession(authorization))
+                return Unauthorized();
+            try {
+                _dbService.AssignToTask(taskId, userId);
+                return Ok();
+            } catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpDelete("assign")]
+        public IActionResult RemoveAssignToTask ([FromQuery(Name="user-id")] Guid userId, [FromQuery(Name="task-id")] Guid taskId)
+        {
+            Guid authorization = Guid.Parse(Request.Headers["Authorization"]);
+            if (!_sessionService.ValidateSession(authorization))
+                return Unauthorized();
+            try {
+                _dbService.RemoveAssignToTask(taskId, userId);
+                return Ok();
+            } catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

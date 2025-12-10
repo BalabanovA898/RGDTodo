@@ -22,10 +22,12 @@ namespace server.Services
         public bool ValidatePassword(LoginDTO login);
 
 
-        public TaskDTO GetTaskById(Guid id);
         public TaskDTO[] GetTasksByProjectId(Guid projectId);
         public Guid CreateTask(CreateTaskDTO task);
         public Guid UpdateTask(UpdateTaskDTO task);
         public void DeleteTask(Guid taskId);
+
+        public void AssignToTask (Guid taskId, Guid userId);
+        public void RemoveAssignToTask (Guid taskId, Guid userId);
     }
 }

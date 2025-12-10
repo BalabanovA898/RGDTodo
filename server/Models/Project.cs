@@ -8,7 +8,6 @@ namespace server.Models
         public Guid Id { get; set; }
         required public string Title { get; set; }
         public string? Description { get; set; }
-        required public string Diagram { get; set; } 
         [ForeignKey("UserId")]
         public Guid UserId { get; set; }
     }

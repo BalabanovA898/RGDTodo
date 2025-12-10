@@ -4,7 +4,7 @@ namespace server.DTOs
     {
         required public string Email { get; set; }
         public string[]? Stacks{ get; set; }
-        public byte[]? ProfilePicture { get; set; }
+        public string? ProfilePicture { get; set; }
         public string? Username { get; set; }
     }
 }

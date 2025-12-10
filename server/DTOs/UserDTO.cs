@@ -6,6 +6,6 @@ namespace server.DTOs
         public string? Email { get; set; }
         public string? Username { get; set; }
         public string[]? Stacks { get; set; }
-        public byte[]? ProfilePicture { get; set; }
+        public string? ProfilePicture { get; set; }
     }
 }

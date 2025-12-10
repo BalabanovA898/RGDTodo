@@ -30,6 +30,7 @@ namespace server.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [Route("projects")]
         [HttpGet]
         public IActionResult GetProjectsByUserId([FromQuery(Name = "user-id")] Guid userId)
         {
@@ -53,6 +54,14 @@ namespace server.Controllers
                 return Unauthorized();
             try {
                 var projectId = _dbService.CreateProject(project);
+                var task = _dbService.CreateTask(new CreateTaskDTO
+                {
+                    Title = project.Title,
+                    ParentId = null,
+                    ProjectId = projectId,
+                    Status = "CREATED"
+                });
+                _dbService.AssignToTask(task, project.UserId);
                 return Ok(projectId);
             } catch (Exception e)
             {
