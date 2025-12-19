@@ -32,11 +32,12 @@ export const CarouselItem = observer((props: Props) => {
 
     const navigate = useNavigate();
 
-    function deleteProject () {
+    async function deleteProject () {
         try {
-            ProjectService.deleteProject((props.item as any).id, store.user.id);
+            await ProjectService.deleteProject((props.item as any).id, store.user.id);
         } catch (e: any) {
-            store.notifications.push(new Notification("error", e.message));        
+            console.log(e)
+            store.notifications.push(new Notification("error", e.response.data));        
         } 
     }
 
@@ -58,8 +59,12 @@ export const CarouselItem = observer((props: Props) => {
                 setNewDescription((props.item as any).description);
                 setEditing(false);
             }}>Cancel</Button>
-            <Button onClick={() => {
-                ProjectService.editProject((props.item as any).id, newTitle, newDescription, store.user.id);
+            <Button onClick={async () => {
+                try {
+                    await ProjectService.editProject((props.item as any).id, newTitle, newDescription, store.user.id);
+                } catch (e: any) {
+                    store.notifications.push(new Notification("error", e.response.data));        
+                }
                 setEditing(false);
             }}>Save</Button>
         </div>

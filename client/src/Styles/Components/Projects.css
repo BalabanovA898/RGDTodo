@@ -8,6 +8,7 @@
     background-color: var(--background-color-1);
     border-radius: 12px;
     flex-grow: 15;
+    box-shadow: 1px 2px 8px #ffffffa0;
 }
 
 .projects__header__container {

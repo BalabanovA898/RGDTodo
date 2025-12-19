@@ -85,7 +85,7 @@ export const Profile = observer(() => {
             :
             <h1 className="profile__username" onClick={() => setNameEditing(true)}>{store.user.username}</h1>
         }
-        {newStacks ?
+        {newStacks?.length ?
         <div className="profile__stacks">
             {
                 newStacks.map(item => <div className="stack-item" onClick={(() => setStackEditModalActive(true))}><p>{item}</p></div>)

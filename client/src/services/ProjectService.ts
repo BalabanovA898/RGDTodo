@@ -33,6 +33,7 @@ export default class ProjectService {
                 Description: description,
                 UserId: userId,
             });
+            console.log(response);
             return response.data; 
         } catch (e: any) {
            throw e; 
