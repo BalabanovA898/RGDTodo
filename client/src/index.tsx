@@ -33,13 +33,12 @@ root.render(
     <NotificationHandler></NotificationHandler>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login/>}/>
+        <Route path="/login" element={<Login></Login>}></Route>
         <Route path="/register" element={<Register></Register>}></Route>
         <Route path="/project/:id" element={<ProjectTodos></ProjectTodos>}></Route>
         <Route path="/home" element={<Home></Home>}></Route>
         <Route path="/profile" element={<Profile></Profile>}></Route>
         <Route path="/share-link/:id" element={<InvitationToProject></InvitationToProject>}></Route> 
-        <Route path="*" element={<NotFound></NotFound>}></Route>
       </Routes>
     </BrowserRouter>
   </Context.Provider>

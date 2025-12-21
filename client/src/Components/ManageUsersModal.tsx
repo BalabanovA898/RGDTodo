@@ -66,7 +66,6 @@ export const ManageUsersModal = observer((props: Props) => {
                     props.todo?.assigned?.map(user => <div className="user-element">
                         <p>{user.username}</p>
                         <button className="user-element__btn" onClick={() => {
-                            console.log(props.todo?.assigned);
                             moveUserFromAssigned((user as any).id)}
                         }>↓</button>
                     </div>)

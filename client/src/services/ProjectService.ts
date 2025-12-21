@@ -14,7 +14,7 @@ export default class ProjectService {
 
     static async createNewProject (title: string, description: string, userId: string): Promise<string> {
         try {
-            const response = await $api.post("/projects", {
+            const response = await $api.post("/Projects", {
                 Title: title,
                 Description: description,
                 UserId: userId,
@@ -27,7 +27,7 @@ export default class ProjectService {
 
     static async editProject (projectId:string, title: string, description: string, userId: string): Promise<string> {
         try {
-            const response = await $api.put(`/projects?user=${userId}`, {
+            const response = await $api.put(`/Projects?user=${userId}`, {
                 Id: projectId,
                 Title: title,
                 Description: description,
@@ -42,7 +42,7 @@ export default class ProjectService {
     
     static async deleteProject (projectId: string, userId: string): Promise<string> {
         try {
-            const response = await $api.delete(`/projects?user=${userId}&id=${projectId}`);
+            const response = await $api.delete(`/Projects?user=${userId}&id=${projectId}`);
             return response.data; 
         } catch (e: any) {
            throw e; 

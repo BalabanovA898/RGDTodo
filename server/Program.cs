@@ -17,15 +17,18 @@ builder.Services.AddOpenApiDocument(config =>
 
 builder.Services.AddControllers();
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5000);
+});
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: "mySpec", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.AllowAnyOrigin()
         .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials();
+        .AllowAnyMethod();
     });
 });
 
