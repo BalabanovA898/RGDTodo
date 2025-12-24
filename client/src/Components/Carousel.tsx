@@ -13,24 +13,26 @@ export const Carousel = (props: Props) => {
     const [currentOffset, setCurrentOffset] = useState<number>(0);
     const [itemsToShow, setItemsToShow] = useState<IProjectDTO[]>([]);
     useEffect(() => {
-        setItemsToShow(props.items.slice(currentOffset, 
-            (currentOffset + props.maxItemsOnScreen)));
+        if (props.items.length > props.maxItemsOnScreen)
+            setItemsToShow(props.items.slice(currentOffset, 
+                (currentOffset + props.maxItemsOnScreen)));
+        else setItemsToShow(props.items);
     }, [currentOffset]);
     return <>
     {
         props.items.length > 0 ?
         <div className="carousel__container">
-            <button className="carousel__controls-btn"
+            { props.items.length > props.maxItemsOnScreen && <button className="carousel__controls-btn"
             onClick={() => {
                 setCurrentOffset((currentOffset - 1 >= 0 ? currentOffset - 1 : props.items.length - 1)%props.items.length)
-            }}>{"<"}</button>
+            }}>{"<"}</button>}
             {
             itemsToShow.map((item, index) => <CarouselItem item={item} key={index}></CarouselItem>)
             }
-            <button className="carousel__controls-btn"
+            { props.items.length > props.maxItemsOnScreen && <button className="carousel__controls-btn"
              onClick={() => {
                 setCurrentOffset((currentOffset + 1)%props.items.length)
-            }}>{">"}</button>
+            }}>{">"}</button>}
         </div> :
         <div style={{color: "#fff"}}>No projects?</div>
     }
