@@ -37,9 +37,6 @@ RUN dotnet publish -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 
 # Мета информация
-LABEL maintainer="your-email@example.com"
-LABEL description="Todo App with React frontend and .NET backend"
-
 WORKDIR /app
 
 # 1. Копируем собранный бэкенд из второго этапа
