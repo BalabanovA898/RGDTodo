@@ -39,11 +39,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-app.MapControllers();
+app.UseCors("mySpec");
 app.UseHttpsRedirection();
+app.MapControllers().RequireCors("mySpec");
 
 app.UseOpenApi();
 app.UseSwaggerUi();
 
-app.UseCors("mySpec");
 app.Run();
