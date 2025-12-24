@@ -25,12 +25,12 @@ builder.Services.AddCors(options =>
 });
 
 // Ваши существующие сервисы
-builder.Services.AddTransient<IDbService, DbService>();
-builder.Services.AddTransient<ISessionService, SessionService>();
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"));
 });
+builder.Services.AddScoped<ISessionService, SessionService>();
+builder.Services.AddScoped<IDbService, DbService>();
 
 var app = builder.Build();
 
