@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: rgdtodo-unified
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__PostgresConnection
+        fromDatabase:
+          name: todo-db
+          property: connectionString
+    healthCheckPath: /health
+    autoDeploy: true
+    plan: free
+    # Render автоматически добавляет переменную PORT
+    # Не нужно добавлять её вручную!
+
+databases:
+  - name: todo-db
+    databaseName: todoapp
+    plan: free
+    # Render создаст строку подключения автоматически

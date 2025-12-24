@@ -1,40 +1,61 @@
+version: '3.8'
+
 services:
-  postgresql:
-    image: postgres:latest
-    hostname: dbservice
+  # PostgreSQL для разработки
+  postgres:
+    image: postgres:15-alpine
+    container_name: todo-postgres
     environment:
-      POSTGRES_DB: todo
+      POSTGRES_DB: todoapp
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql
+      POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
 
-  backend:
+  # Основное приложение (бэкенд + фронтенд)
+  app:
     build:
-      context: ./server
+      context: .
       dockerfile: Dockerfile
+    container_name: todo-app
     ports:
-      - "5000:5000"
+      - "10000:10000"
+    environment:
+      PORT: 10000
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__PostgresConnection: "Host=postgres;Database=todoapp;Username=postgres;Password=postgress;Port=5432"
+      # Переменные для .NET
+      DOTNET_USE_POLLING_FILE_WATCHER: 1  # Для hot reload в контейнере
+    volumes:
+      # Hot reload для .NET
+      - ./server:/app/server:ro
+      # Hot reload для React (если нужно)
+      - ./client/src:/app/client/src:ro
     depends_on:
-      - postgresql
+      postgres:
+        condition: service_healthy
+    # Для разработки: запускаем с watch
+    command: sh -c "cd /app && dotnet watch run --project server/server.csproj"
 
-
-  frontend:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
+  # Опционально: отдельный сервер разработки для фронтенда
+  frontend-dev:
+    image: node:18-alpine
+    container_name: todo-frontend-dev
+    working_dir: /app
     ports:
-      - "3000:80"  
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+    command: sh -c "npm install && npm run dev"
     depends_on:
-      - backend
+      - app
 
 volumes:
   postgres_data:

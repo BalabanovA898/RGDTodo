@@ -1,0 +1,29 @@
+# Игнорируемые файлы
+**/.git
+**/.gitignore
+**/.vscode
+**/.idea
+
+# Node.js
+**/node_modules
+**/npm-debug.log
+**/.env.local
+**/.env.development.local
+
+# .NET
+**/bin
+**/obj
+**/*.csproj.user
+**/*.suo
+
+# Vite
+**/dist
+**/*.log
+
+# Локальные настройки
+docker-compose.override.yml
+docker-compose.debug.yml
+
+# Исключения (не игнорируем важное)
+!server/*.csproj
+!client/package.json

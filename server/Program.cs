@@ -1,26 +1,22 @@
 using server.Models;
 using Microsoft.EntityFrameworkCore;
 using server.Services;
-using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Используем порт из переменной окружения Render
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
-
-// Слушаем на всех интерфейсах
+// === КОНФИГУРАЦИЯ ПОРТА ===
+// Render передает порт через переменную окружения PORT
+var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
-// Либо через ConfigureKestrel:
-// builder.WebHost.ConfigureKestrel(options =>
-// {
-//     options.ListenAnyIP(int.Parse(port));
-// });
+// === КОНФИГУРАЦИЯ СЕРВИСОВ ===
+builder.Services.AddControllers();
 
-// CORS - разрешаем всё для тестирования
+// CORS НЕ НУЖЕН для статики из того же origin!
+// Но оставим для API если нужно
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("DevelopmentPolicy", policy =>
     {
         policy.AllowAnyOrigin()
               .AllowAnyMethod()
@@ -28,18 +24,9 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Ваши сервисы
+// Ваши существующие сервисы
 builder.Services.AddTransient<IDbService, DbService>();
 builder.Services.AddTransient<ISessionService, SessionService>();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddOpenApiDocument(config =>
-{
-    config.Title = "My API (.NET 9)";
-    config.Version = "v1";
-});
-builder.Services.AddControllers();
-
-// База данных
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"));
@@ -47,21 +34,35 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-// Включить CORS ПОСЛЕ routing middleware
-app.UseCors("AllowAll");
-app.MapControllers().RequireCors("AllowAll");
+// === ПРОМЕЖУТОЧНОЕ ПО (MIDDLEWARE) ===
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("DevelopmentPolicy");
+}
 
-// Swagger
-app.UseOpenApi();
-app.UseSwaggerUi();
+using var scope = app.Services.CreateScope();
+var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+dbContext.Database.Migrate(); // Применяет pending миграции
 
-// Health check endpoint
+// 1. Обслуживаем статические файлы React
+//    Vite собирает фронтенд в папку 'dist'
+app.UseDefaultFiles();  // Ищет index.html, index.htm
+app.UseStaticFiles();   // Обслуживает файлы из wwwroot
+
+// 2. API маршрутизация
+app.MapControllers();
+
+// 3. Health check endpoint для Render
 app.MapGet("/health", () => new 
 {
-    Status = "OK",
+    Status = "healthy",
     Timestamp = DateTime.UtcNow,
+    Service = "Todo App (API + React)",
     Port = port,
-    Host = Dns.GetHostName()
+    Environment = app.Environment.EnvironmentName
 });
+
+// 4. ВСЕ остальные маршруты → index.html (для SPA маршрутизации)
+app.MapFallbackToFile("/index.html");
 
 app.Run();

@@ -1,0 +1,13 @@
+# Файлы, которые НЕ нужно отправлять на Render
+.git
+.gitignore
+.vscode
+.idea
+docker-compose*
+node_modules
+dist
+bin
+obj
+*.log
+.env*
+Dockerfile.dev
