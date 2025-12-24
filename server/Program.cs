@@ -4,16 +4,11 @@ using server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// === КОНФИГУРАЦИЯ ПОРТА ===
-// Render передает порт через переменную окружения PORT
 var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
-// === КОНФИГУРАЦИЯ СЕРВИСОВ ===
 builder.Services.AddControllers();
 
-// CORS НЕ НУЖЕН для статики из того же origin!
-// Но оставим для API если нужно
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevelopmentPolicy", policy =>
@@ -24,7 +19,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Ваши существующие сервисы
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"));
@@ -34,7 +28,6 @@ builder.Services.AddScoped<IDbService, DbService>();
 
 var app = builder.Build();
 
-// === ПРОМЕЖУТОЧНОЕ ПО (MIDDLEWARE) ===
 if (app.Environment.IsDevelopment())
 {
     app.UseCors("DevelopmentPolicy");
@@ -42,17 +35,13 @@ if (app.Environment.IsDevelopment())
 
 using var scope = app.Services.CreateScope();
 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-dbContext.Database.Migrate(); // Применяет pending миграции
+dbContext.Database.Migrate(); 
 
-// 1. Обслуживаем статические файлы React
-//    Vite собирает фронтенд в папку 'dist'
-app.UseDefaultFiles();  // Ищет index.html, index.htm
-app.UseStaticFiles();   // Обслуживает файлы из wwwroot
+app.UseDefaultFiles();  
+app.UseStaticFiles();   
 
-// 2. API маршрутизация
 app.MapControllers();
 
-// 3. Health check endpoint для Render
 app.MapGet("/health", () => new 
 {
     Status = "healthy",
@@ -62,7 +51,6 @@ app.MapGet("/health", () => new
     Environment = app.Environment.EnvironmentName
 });
 
-// 4. ВСЕ остальные маршруты → index.html (для SPA маршрутизации)
 app.MapFallbackToFile("/index.html");
 
 app.Run();

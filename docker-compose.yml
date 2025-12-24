@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # PostgreSQL для разработки
   postgres:
     image: postgres:15-alpine
     container_name: todo-postgres
@@ -19,7 +18,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # Основное приложение (бэкенд + фронтенд)
   app:
     build:
       context: .
@@ -31,20 +29,15 @@ services:
       PORT: 10000
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__PostgresConnection: "Host=postgres;Database=todoapp;Username=postgres;Password=postgress;Port=5432"
-      # Переменные для .NET
-      DOTNET_USE_POLLING_FILE_WATCHER: 1  # Для hot reload в контейнере
+      DOTNET_USE_POLLING_FILE_WATCHER: 1 
     volumes:
-      # Hot reload для .NET
       - ./server:/app/server:ro
-      # Hot reload для React (если нужно)
       - ./client/src:/app/client/src:ro
     depends_on:
       postgres:
         condition: service_healthy
-    # Для разработки: запускаем с watch
     command: sh -c "cd /app && dotnet watch run --project server/server.csproj"
 
-  # Опционально: отдельный сервер разработки для фронтенда
   frontend-dev:
     image: node:18-alpine
     container_name: todo-frontend-dev

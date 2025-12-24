@@ -14,11 +14,8 @@ services:
     healthCheckPath: /health
     autoDeploy: true
     plan: free
-    # Render автоматически добавляет переменную PORT
-    # Не нужно добавлять её вручную!
 
 databases:
   - name: todo-db
     databaseName: todoapp
     plan: free
-    # Render создаст строку подключения автоматически
