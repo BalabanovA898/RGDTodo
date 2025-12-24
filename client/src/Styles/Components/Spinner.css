@@ -1,0 +1,22 @@
+.spinner-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3000;
+}
+
+.spinner {
+    width: 200px;
+    height: 200px;
+    animation: infinite Spin 0.8s linear;
+}
+
+@keyframes Spin {
+    0% {
+        rotate: 0deg;
+    }
+    100% {
+        rotate: 360deg;
+    }
+}

@@ -8,6 +8,8 @@ import { FormLink } from "../Components/FormLink"
 import { Context } from ".."
 import { observer } from "mobx-react-lite"
 import { useNavigate } from "react-router-dom"
+import { Spinner } from "../Components/Spinner"
+import Notification from "../Classes/Notification"
 
 
 export const Login = observer(() => {
@@ -19,6 +21,7 @@ export const Login = observer(() => {
     const navigate = useNavigate();
 
     return <>
+        {store.isLoading && <Spinner></Spinner>}
         <FormCard>
             <h1 className="auth__text">Wellcome</h1>
             <Input onChange={setEmail} 
@@ -29,9 +32,16 @@ export const Login = observer(() => {
                 type="password"></Input>
             <Button onClick={
                 async () => {
-                    await store.login(email, password);
-                    if (store.isAuth)
-                        navigate("/home");
+                    try {
+                        store.setLoading(true);
+                        await store.login(email, password);
+                        if (store.isAuth)
+                            navigate("/home");
+                    } catch (e: any) {
+                        store.notifications.push(new Notification("error", e.message));
+                    } finally {
+                        store.setLoading(false);
+                    }
                 }
             }>Login</Button>
             <FormLink endpoint="/register">Don't have an account?</FormLink>

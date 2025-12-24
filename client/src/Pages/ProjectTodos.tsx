@@ -15,6 +15,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import TodosService from "../services/TodosService"
 import Notification from "../Classes/Notification"
 import UserService from "../services/UserService"
+import { Spinner } from "../Components/Spinner"
 
 
 export const ProjectTodos = observer(() => {
@@ -26,10 +27,12 @@ export const ProjectTodos = observer(() => {
     const [projectUsers, setProjectUsers] = useState<User[]>([]);
 
     useEffect(() => {
-        if (localStorage.getItem("session")) 
+        if (localStorage.getItem("session")) {
+            store.setLoading(true);
             store.checkAuth().then((res:boolean) => {
                 if (!res) {
-                    store.notifications.push(new Notification("error", "You must log in to get acces to this page"))
+                    store.notifications.push(new Notification("error", "You must log in to get acces to this page"));
+                    store.setLoading(false);
                     navigate("/")
                 }
             }).then(
@@ -41,9 +44,11 @@ export const ProjectTodos = observer(() => {
                     else
                         setProjectUsers(res.data);
                 }
-            );
+            ).finally(() => store.setLoading(false));
+        }
         else {
             store.notifications.push(new Notification("error", "You must log in to get acces to this page"))
+            store.setLoading(false);
             navigate("/")
         }
     }, []);
@@ -120,6 +125,7 @@ export const ProjectTodos = observer(() => {
     }
 
     return <div className="project__todos__container">
+        {store.isLoading && <Spinner></Spinner>}
     <Header></Header>
     <AddTodoForm 
         addChild={addChild} 

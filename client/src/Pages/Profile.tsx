@@ -11,6 +11,7 @@ import { Input } from "../Components/Input"
 import { Modal } from "../Components/Modal"
 import { Stack } from "../Enums/Stack"
 import Notification from "../Classes/Notification"
+import { Spinner } from "../Components/Spinner"
 
 export const Profile = observer(() => {
     const {store} = useContext(Context);
@@ -28,10 +29,12 @@ export const Profile = observer(() => {
     const allStacks: Stack[] = ["Frontend", "Backend", "Fullstack", "Mobile", "Designer"];
 
     useEffect(() => {
+        store.setLoading(true);
         if (localStorage.getItem("session")) 
             store.checkAuth().then((res:boolean) => {
                 if (!res) {
                     store.notifications.push(new Notification("error", "You must log in to get acces to this page"))
+                    store.setLoading(false);
                     navigate("/")
                 }
             }).then(
@@ -40,15 +43,17 @@ export const Profile = observer(() => {
                     setNewproflePicture(ppf);
                     var stacks = (store.user as any).stacks;
                     setNewStacks(stacks);
+                    store.setLoading(false);
                 }
             );
         else {
-            store.notifications.push(new Notification("error", "You must log in to get acces to this page"))
+            store.notifications.push(new Notification("error", "You must log in to get acces to this page"));
+            store.setLoading(false);
             navigate("/")
         }
     }, []);
 
-    return <div className="profile__container" style={{backgroundColor: "#000000ff"}}>
+    return !store.isLoading ? <div className="profile__container" style={{backgroundColor: "#000000ff"}}>
         <Modal
         active={isStackEditModalActive}
         setActive={setStackEditModalActive}>
@@ -100,13 +105,15 @@ export const Profile = observer(() => {
                 navigate("/home");
             }}>Back</Button>
             <Button onClick={async () => {
+                store.setLoading(true);
                 const res = await ProfileService.updateProfile(store.user.id, store.user.email, newStacks, newproflePicture, newUsername);
                 if (res) 
                     store.notifications.push(new Notification("error", res));
                 else 
                     store.notifications.push(new Notification("notification", "Profile was updated"));
+                store.setLoading(false);
                 navigate("/home");
             }}>Save</Button>
         </div>
-    </div>
+    </div> : <Spinner></Spinner>
 })

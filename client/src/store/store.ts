@@ -26,6 +26,10 @@ export default class Store {
         this.user = user;
     }
 
+    setLoading (status: boolean) {
+        this.isLoading = status;
+    }
+
     async login(email: string, password: string) {
         this.isLoading = true;
         try {

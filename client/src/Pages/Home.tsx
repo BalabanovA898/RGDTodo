@@ -11,6 +11,7 @@ import { CreateProjectModal } from "../Components/CreateProjectModal"
 import ProjectService from "../services/ProjectService"
 import IProjectDTO from "../models/response/ProjectDTO"
 import Notification from "../Classes/Notification"
+import { Spinner } from "../Components/Spinner"
 
 interface Props {
 
@@ -38,10 +39,12 @@ export const Home = observer((props: Props) => {
     }
 
     useEffect(() => {
-        if (localStorage.getItem("session")) 
+        if (localStorage.getItem("session")) {
+            store.setLoading(true);
             store.checkAuth().then((res:boolean) => {
                 if (!res) {
                     store.notifications.push(new Notification("error", "You must log in to get acces to this page"))
+                    store.setLoading(false)
                     navigate("/")
                 }
             }).then(
@@ -53,12 +56,13 @@ export const Home = observer((props: Props) => {
                     } else 
                         setProjects(res)
                 })
-            );
+            ).finally(() => store.setLoading(false));
+        }
         else {
             store.notifications.push(new Notification("error", "You must log in to get acces to this page"))
+            store.setLoading(false)
             navigate("/")
-        }
-    }, [])
+        }}, [])
 
     return !store.isLoading ?
         <div className="home__container">
@@ -73,5 +77,5 @@ export const Home = observer((props: Props) => {
                 createNewProject={createNewProject}
             ></CreateProjectModal>
         </div>
-         : <p>TODO: MAKE SPINNER</p>
+         : <Spinner></Spinner> 
 });

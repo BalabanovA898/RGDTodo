@@ -7,6 +7,7 @@ import { Context } from "..";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import Notification from "../Classes/Notification";
+import { Spinner } from "../Components/Spinner";
 
 
 export const Register = observer(() => {
@@ -24,6 +25,7 @@ export const Register = observer(() => {
     }
 
     return <>
+        {store.isLoading && <Spinner></Spinner>}
         <FormCard>
             <h1 className="auth__text">Registration</h1>
             <Input onChange={setEmail} 
@@ -45,7 +47,14 @@ export const Register = observer(() => {
                         store.notifications.push(new Notification("error", "Passwords don't match."));
                         return;
                     }
-                    await store.register(email, password);
+                    try {
+                        store.setLoading(true);
+                        await store.register(email, password);
+                    } catch (e: any) {
+                        store.notifications.push(new Notification("error", e.message));
+                    } finally {
+                        store.setLoading(false);
+                    }
                     if (store.isAuth) navigate("/home");
                 }
             }>Sign up</Button>
