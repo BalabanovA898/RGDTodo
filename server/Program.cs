@@ -30,6 +30,7 @@ builder.Services.AddScoped<IDbService, DbService>();
 var app = builder.Build();
 
 //DEV options
+//Comment on prod
 app.UseCors("DevelopmentPolicy");
 
 using var scope = app.Services.CreateScope();

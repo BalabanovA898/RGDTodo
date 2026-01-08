@@ -28,13 +28,8 @@ export const Home = observer((props: Props) => {
 
     function createNewProject (title: string, description: string) {
         ProjectService.createNewProject(title, description, store.user.id).then((id) => {
-            setProjects([{
-                Id: id,
-                Title: title,
-                Description: description,
-                UserId: store.user.id
-            }]);
-        store.notifications.push(new Notification("notification", "Projects was succesfully created"))
+            navigate(`/project/${id}`);
+            store.notifications.push(new Notification("notification", "Projects was succesfully created."))
         }).catch(e => store.notifications.push(new Notification("error", e.message)));
     }
 

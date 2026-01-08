@@ -2,7 +2,9 @@ import axios from "axios";
 
 
 //DEV URL
+//Comment on prod
 export const API_URL = "http://localhost:10000/api";
+//Uncomment on prod
 //export const API_URL = "/api";
 
 const $api = axios.create({
