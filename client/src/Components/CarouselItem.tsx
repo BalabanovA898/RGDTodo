@@ -78,7 +78,11 @@ export const CarouselItem = observer((props: Props) => {
             isHover && !isEditing && <div className="carousel__item__controls">
                 <button id="edit-btn" className="carousel__item__controls__btn" onClick={() => setEditing(true)}>
                     <img className="carousel__item__controls__icon" src={edit} alt="edit"/></button>
-                <button id="share-btn" className="carousel__item__controls__btn" onClick={() => navigator.clipboard.write([new ClipboardItem({["text/plain"]: `http://rgdtodo.onrender.com/share-link/${(props.item as any).id}`})])}>
+                <button id="share-btn" className="carousel__item__controls__btn" onClick={() => 
+                {
+                    navigator.clipboard.write([new ClipboardItem({["text/plain"]: `http://rgdtodo.onrender.com/share-link/${(props.item as any).id}`})])
+                    store.notifications.push(new Notification("notification", "Copied to clipboard."))
+                }}>
                     <img className="carousel__item__controls__icon" src={share} alt="share" /></button>
                 <button id="delete-btn" className="carousel__item__controls__btn" onClick={deleteProject}>
                     <img className="carousel__item__controls__icon" src={deleteIcon} alt="delete" /></button>

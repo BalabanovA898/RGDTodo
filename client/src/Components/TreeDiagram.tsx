@@ -39,7 +39,7 @@ export const TreeDiagram = observer((props: Props) => {
                     strokeWidth={3} fill={fillColor} paintOrder={"fill"}></circle>
                     <foreignObject width={200} height={200}> 
                         <div style={{ display: "flex", margin: "20px"}}>
-                            <h3 style={{display: "block", width: "100%", fontSize:"12px"}}>{value.assigned?.some(item => item.id === store.user.id) && "(YOUR)"}{e.nodeDatum.name}</h3>
+                            <h3 style={{display: "block", width: "100%", fontSize:"12px", maxWidth:"135px"}}>{value.assigned?.some(item => item.id === store.user.id) && "(YOUR)"}{e.nodeDatum.name}</h3>
                         </div>
                     </foreignObject>
                 </React.Fragment>
