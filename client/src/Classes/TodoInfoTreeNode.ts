@@ -22,7 +22,16 @@ export default class TodoInfoTreeNode {
             this.children?.forEach(item => item.editNodeWithId(id, newValue));
         }
     }
-    
+   
+    getNodeWithId(id: string) {
+        if (this.value.id === id) return this;
+        if (!this.children) return null;
+        for (const item of this.children) {
+            if (item.getNodeWithId(id) !== null) return item;
+        }
+        return null;
+    }
+
     addChildToNodeWithId(id: string, newNode: Todo) {
         if (this.value.id === id) {
             this.children?.push(new TodoInfoTreeNode(newNode, [], this.value.id))

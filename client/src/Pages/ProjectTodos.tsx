@@ -39,7 +39,6 @@ export const ProjectTodos = observer(() => {
                 async () => {
                     fetchTodos();
                     const res = await UserService.getProjectUsers(projectId || "");
-                    console.log(res);
                     if (typeof res === "string")
                         store.notifications.push(new Notification("error", res));
                     else
@@ -86,6 +85,12 @@ export const ProjectTodos = observer(() => {
     const [root, setRoot] = useState<TodoInfoTreeNode>(new TodoInfoTreeNode(new Todo("1","1","CREATED", "", "Some text", undefined, new Date(Date.now())), [], null));
 
     const [selectedNode, setSelectedNode] = useState<TodoInfoTreeNode | undefined>(undefined);
+
+    useEffect(() => {
+        if (store.selectedNode === null) return;
+        let res = root.getNodeWithId(store.selectedNode);
+        if (res !== null) setSelectedNode(res);
+    }, [store.selectedNode])
 
     const [isAddChildModalActive, setAddChildModalActive] = useState<boolean>(false);
 

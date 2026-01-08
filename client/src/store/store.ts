@@ -14,6 +14,8 @@ export default class Store {
     isLoading = false;
     notifications = [] as Notification[];
 
+    selectedNode: string | null = null;
+
     constructor () {
         makeAutoObservable(this);
     }

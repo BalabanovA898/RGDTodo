@@ -20,6 +20,9 @@ export const TreeDiagram = observer((props: Props) => {
             leafNodeClassName="tree__leafs"
             branchNodeClassName="tree__branch"
             rootNodeClassName="tree__root"
+            onNodeClick={(e) => {
+                console.log(e);
+            }}
             renderCustomNodeElement={(e) => {
                 const value = (e.nodeDatum as any).value as Todo;
                 let fillColor = "#fff";
@@ -34,7 +37,7 @@ export const TreeDiagram = observer((props: Props) => {
                         fillColor = "lime"; 
                 }
                 return <React.Fragment>
-                    <circle r={20} 
+                    <circle r={20} onClick={() => store.selectedNode = (e.nodeDatum as any).value.id}
                     stroke={value.deadline ? new Date(value.deadline).getTime() > new Date().getTime() || value.status === "DONE" ? "none" : "#ff0000" : "none"} 
                     strokeWidth={3} fill={fillColor} paintOrder={"fill"}></circle>
                     <foreignObject width={200} height={200}> 
