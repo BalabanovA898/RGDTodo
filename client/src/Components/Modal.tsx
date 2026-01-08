@@ -5,6 +5,7 @@ import "../Styles/Components/Modal.css"
 interface Props extends PropsWithChildren {
     active: boolean;
     setActive: (active: boolean) => void;
+    onKeyDown?: (e: any) => void;
 }
 
 export const Modal = (props: Props) => {

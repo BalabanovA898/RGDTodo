@@ -16,7 +16,8 @@ export const CreateProjectModal = (props: Props) => {
 
     return <Modal 
     active={props.active}
-    setActive={props.setActive}>
+    setActive={props.setActive}
+    >
         <Input type="text" 
             placeholder="title"
             onChange={setTitle}
@@ -27,11 +28,6 @@ export const CreateProjectModal = (props: Props) => {
             value={description}></Input>
         <div style={{display: "flex"}}>
             <Button onClick={() => {
-                setTitle("")
-                setDescription("");
-                props.setActive(false);
-            }}>Cancel</Button>
-            <Button onClick={() => {
                 props.createNewProject(title, description);
                 setTitle("")
                 setDescription("");
@@ -39,6 +35,11 @@ export const CreateProjectModal = (props: Props) => {
             }}>
                 Create
             </Button>
+            <Button onClick={() => {
+                setTitle("")
+                setDescription("");
+                props.setActive(false);
+            }}>Cancel</Button>
         </div>
     </Modal>
 }

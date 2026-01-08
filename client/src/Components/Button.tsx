@@ -5,10 +5,12 @@ import "../Styles/Components/Button.css"
 interface Props extends PropsWithChildren {
     className?: string;
     onClick?: () => void;
+    type?: string;
 }
 
 export const Button = (props: Props) => {
-    return <button 
+    return <button
+        formAction=""
         className= {["button", props.className].join(" ")}
         onClick={e => {
             e.preventDefault();

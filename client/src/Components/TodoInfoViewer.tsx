@@ -124,5 +124,5 @@ export const TodoInfoViewer = observer((props: Props) => {
                 <button id="todo-delete-btn" className="todo-info-controls-btn"><img src={deleteIcon} alt="Remove todo" onClick={() => props.deleteTodo(props.todo?.id || "")}></img></button>
             </div>
         </div>
-    </div> : <div className="todo-info-viewer__container placholder"><p>CLICK ON TODO</p></div>
+    </div> : <div className="todo-info-viewer__container placholder"><p>RIGHT CLICK ON TODO TO OPEN | LEFT CLICK TO EXPAND LIST</p></div>
 })
