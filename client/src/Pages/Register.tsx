@@ -20,7 +20,7 @@ export const Register = observer(() => {
     const navigate = useNavigate();
 
     function validatePssword (password: string) {
-        const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
+        const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
         return password.match(re);
     }
 
