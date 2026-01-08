@@ -28,10 +28,8 @@ builder.Services.AddScoped<IDbService, DbService>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseCors("DevelopmentPolicy");
-}
+//DEV options
+app.UseCors("DevelopmentPolicy");
 
 using var scope = app.Services.CreateScope();
 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();

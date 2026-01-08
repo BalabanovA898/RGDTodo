@@ -1,9 +1,12 @@
 import axios from "axios";
 
-export const API_URL = "/api";
+
+//DEV URL
+export const API_URL = "http://localhost:10000/api";
+//export const API_URL = "/api";
 
 const $api = axios.create({
-    withCredentials: true,
+    withCredentials: false,
     baseURL: API_URL
 });
 
