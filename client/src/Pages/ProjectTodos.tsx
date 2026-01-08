@@ -39,6 +39,7 @@ export const ProjectTodos = observer(() => {
                 async () => {
                     fetchTodos();
                     const res = await UserService.getProjectUsers(projectId || "");
+                    console.log(res);
                     if (typeof res === "string")
                         store.notifications.push(new Notification("error", res));
                     else

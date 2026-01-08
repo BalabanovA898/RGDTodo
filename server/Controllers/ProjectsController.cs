@@ -62,6 +62,7 @@ namespace server.Controllers
                     Status = "CREATED"
                 });
                 _dbService.AssignToTask(task, project.UserId);
+                _dbService.AddProjectMember(projectId, project.UserId);
                 return Ok(projectId);
             } catch (Exception e)
             {

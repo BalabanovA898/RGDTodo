@@ -190,8 +190,10 @@ namespace server.Services
         public void AddProjectMember(Guid projectId, Guid userId)
         {
             var project = _context.Projects.FirstOrDefault(p => p.Id == projectId);
-            if (project.UserId == userId) 
-                throw new Exception("There'no reason to invite yorself.");
+            if (_context.ProjectMembers.Any(item => item.ProjectId == projectId && item.UserId == userId))
+            {
+                throw new Exception("User already is a member");   
+            }
             var projectMember = new ProjectMember
             {
                 ProjectId = projectId,
