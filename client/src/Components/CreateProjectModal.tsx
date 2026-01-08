@@ -25,18 +25,20 @@ export const CreateProjectModal = (props: Props) => {
             placeholder="description"
             onChange={setDescription}
             value={description}></Input>
-        <Button onClick={() => {
-            setTitle("")
-            setDescription("");
-            props.setActive(false);
-        }}>Cancel</Button>
-        <Button onClick={() => {
-            props.createNewProject(title, description);
-            setTitle("")
-            setDescription("");
-            props.setActive(false);
-        }}>
-            Create
-        </Button>
+        <div style={{display: "flex"}}>
+            <Button onClick={() => {
+                setTitle("")
+                setDescription("");
+                props.setActive(false);
+            }}>Cancel</Button>
+            <Button onClick={() => {
+                props.createNewProject(title, description);
+                setTitle("")
+                setDescription("");
+                props.setActive(false);
+            }}>
+                Create
+            </Button>
+        </div>
     </Modal>
 }
