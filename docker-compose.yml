@@ -28,7 +28,7 @@ services:
     environment:
       PORT: 10000
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__PostgresConnection: "Host=postgres;Database=todoapp;Username=postgres;Password=postgress;Port=5432"
+      ConnectionStrings__PostgresConnection: "Host=postgres;Database=todoapp;Username=postgres;Password=password;Port=5432"
       DOTNET_USE_POLLING_FILE_WATCHER: 1 
     volumes:
       - ./server:/app/server:ro
