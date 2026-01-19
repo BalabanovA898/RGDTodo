@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: todo-postgres-dev
+    environment:
+      POSTGRES_DB: todoapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: todo-app-dev
+    ports:
+      - "10000:10000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__PostgresConnection=Host=postgres;Database=todoapp;Username=postgres;Password=password;Port=5432
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+    volumes:
+      - .:/app # Монтируем весь корень проекта
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend-dev:
+    image: node:18-alpine
+    container_name: todo-frontend-dev
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules # Чтобы не затирать локальные модули контейнерными
+    command: sh -c "npm install && npm run dev"
+    depends_on:
+      - app
+
+volumes:
+  postgres_data_dev:

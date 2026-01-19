@@ -1,0 +1,14 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0
+
+WORKDIR /app
+
+# Копируем только файлы проектов для кэширования слоев
+COPY server/*.csproj ./server/
+RUN dotnet restore ./server/server.csproj
+
+# Мы не копируем весь код через COPY, 
+# потому что мы примонтируем его через volumes в docker-compose
+EXPOSE 10000
+
+# Команда по умолчанию (её можно переопределить в compose)
+CMD ["dotnet", "watch", "run", "--project", "server/server.csproj", "--urls", "http://0.0.0.0:10000"]

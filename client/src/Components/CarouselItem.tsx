@@ -1,4 +1,4 @@
-import { useContext, useState } from "react"
+import { Dispatch, useContext, useState } from "react"
 import ICarouselItem from "../Interfaces/ICarouselItem"
 import "../Styles/Components/CarouselItem.css"
 
@@ -17,8 +17,9 @@ import Notification from "../Classes/Notification";
 
 
 interface Props {
-    
-    item: IProjectDTO
+    item: IProjectDTO,
+    projects: IProjectDTO[],
+    setProjects: Dispatch<IProjectDTO[]>
 }
 
 export const CarouselItem = observer((props: Props) => {
@@ -35,6 +36,8 @@ export const CarouselItem = observer((props: Props) => {
     async function deleteProject () {
         try {
             await ProjectService.deleteProject((props.item as any).id, store.user.id);
+            props.setProjects(props.projects.filter(item => (item as any).id !== (props.item as any).id));
+            store.notifications.push(new Notification("notification", "Project had been succesfully deleted."));        
         } catch (e: any) {
             console.log(e)
             store.notifications.push(new Notification("error", e.response.data));        

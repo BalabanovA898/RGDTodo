@@ -10,7 +10,8 @@ import { observer } from "mobx-react-lite"
 
 interface Props {
     setModalActive: Dispatch<boolean>,
-    projects: IProjectDTO[]
+    projects: IProjectDTO[];
+    setProjects: Dispatch<IProjectDTO[]>;
 }
 
 export const Projects = observer((props: Props) => {
@@ -24,6 +25,6 @@ export const Projects = observer((props: Props) => {
                 onClick={() => props.setModalActive(true)}
             >New</Button> 
         </div>
-        <Carousel items={props.projects} maxItemsOnScreen={5}></Carousel>
+        <Carousel items={props.projects} setProjects={props.setProjects} maxItemsOnScreen={5}></Carousel>
     </div>
 });

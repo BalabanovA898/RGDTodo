@@ -65,6 +65,7 @@ export const Home = observer((props: Props) => {
             <Projects 
                 setModalActive={setCreateProjectModalActive}
                 projects={projects}
+                setProjects={setProjects}
             ></Projects>
             <CreateProjectModal 
                 active={createProjectModalActive}

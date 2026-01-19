@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Dispatch, useEffect, useState } from "react";
 import ICarouselItem from "../Interfaces/ICarouselItem"
 import { CarouselItem } from "./CarouselItem";
 import "../Styles/Components/Carousel.css"
@@ -6,6 +6,7 @@ import IProjectDTO from "../models/response/ProjectDTO";
 
 interface Props {
     items: IProjectDTO[];
+    setProjects: Dispatch<IProjectDTO[]>;
     maxItemsOnScreen: number;
 }
 
@@ -61,7 +62,7 @@ export const Carousel = (props: Props) => {
                 }
                 {
                     itemsToShow.map((item, index) => 
-                        <CarouselItem item={item} key={index}></CarouselItem>
+                        <CarouselItem projects={props.items} setProjects={props.setProjects} item={item} key={index}></CarouselItem>
                     )
                 }
                 { props.items.length > props.maxItemsOnScreen && 
