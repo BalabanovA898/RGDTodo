@@ -113,7 +113,7 @@ namespace server.Services
         }
         public ProjectDTO[] GetProjectsByUserId(Guid userId)
         {
-            var projects = _context.Projects.Where(p => p.UserId == userId).ToList();
+            List<Project> projects = [];
             var usersProjects = _context.ProjectMembers.Where(pm => pm.UserId == userId).ToArray();
             foreach (var project in usersProjects)
             {

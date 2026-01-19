@@ -1,5 +1,4 @@
 import { Dispatch, useEffect, useState } from "react";
-import ICarouselItem from "../Interfaces/ICarouselItem"
 import { CarouselItem } from "./CarouselItem";
 import "../Styles/Components/Carousel.css"
 import IProjectDTO from "../models/response/ProjectDTO";
@@ -15,20 +14,17 @@ export const Carousel = (props: Props) => {
     const [itemsToShow, setItemsToShow] = useState<IProjectDTO[]>([]);
     
     useEffect(() => {
-        // Обновляем itemsToShow при изменении items, maxItemsOnScreen или currentOffset
         if (props.items.length <= props.maxItemsOnScreen) {
             setItemsToShow(props.items);
             return;
         }
         
-        // Правильно вычисляем срез для карусели
         const endIndex = currentOffset + props.maxItemsOnScreen;
         let slicedItems: IProjectDTO[];
         
         if (endIndex <= props.items.length) {
             slicedItems = props.items.slice(currentOffset, endIndex);
         } else {
-            // Если выходим за границы массива, берем элементы с начала
             const itemsFromStart = endIndex - props.items.length;
             slicedItems = [
                 ...props.items.slice(currentOffset),
@@ -37,7 +33,7 @@ export const Carousel = (props: Props) => {
         }
         
         setItemsToShow(slicedItems);
-    }, [currentOffset, props.items, props.maxItemsOnScreen]); // Добавили зависимости
+    }, [currentOffset, props.items]); 
     
     const handlePrev = () => {
         setCurrentOffset(prev => 
