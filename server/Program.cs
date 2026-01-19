@@ -31,7 +31,7 @@ var app = builder.Build();
 
 //DEV options
 //Comment on prod
-app.UseCors("DevelopmentPolicy");
+//app.UseCors("DevelopmentPolicy");
 
 using var scope = app.Services.CreateScope();
 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
