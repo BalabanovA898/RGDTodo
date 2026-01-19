@@ -35,7 +35,7 @@ export const AddTodoForm = observer((props: Props) => {
                 <Button onClick={() => props.setActive(false)}>Cancel</Button>
                 <Button onClick={() => {
                     if (props.selectedNode?.deadline && deadline < props.selectedNode?.deadline)
-                        store.notifications.push(new Notification("error", "Wrong deadline"));    
+                        store.notifications.push(new Notification("error", "Wrong deadline", store.removeNotification.bind(store)));    
                     if (props.selectedNode) {
                         const newTodo = new Todo(
                             Date.now().toString(),

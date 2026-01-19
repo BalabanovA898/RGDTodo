@@ -40,7 +40,7 @@ export default class Store {
             this.setAuth(true);
             this.setUser(response.data.userDTO);
         } catch (e: any) {
-            this.notifications.push(new Notification("error", e.message));
+            this.notifications.push(new Notification("error", e.message,  this.removeNotification.bind(this)));
         } finally {
             this.isLoading = false;
         }
@@ -54,7 +54,7 @@ export default class Store {
             this.setAuth(true);
             this.setUser(response.data.userDTO);
         } catch (e: any) {
-            this.notifications.push(new Notification("error", e.message));
+            this.notifications.push(new Notification("error", e.message, this.removeNotification.bind(this)));
         }
         finally {
             this.isLoading = false;
@@ -70,7 +70,7 @@ export default class Store {
             this.setUser({} as User);
         }
         catch (e: any) {
-            this.notifications.push(new Notification("error", e.message));
+            this.notifications.push(new Notification("error", e.message, this.removeNotification.bind(this)));
         }
         finally {
             this.isLoading = false;
@@ -90,10 +90,14 @@ export default class Store {
             this.setUser(response.data.userDTO);
             return true;
         } catch (e: any) {
-            this.notifications.push(new Notification("error", e.message));
+            this.notifications.push(new Notification("error", e.message, this.removeNotification.bind(this)));
             return false;
         } finally {
             this.isLoading = false;
         }
+    }
+
+    removeNotification(id: number) {
+        this.notifications = this.notifications.filter(item => item.id !== id);
     }
 }

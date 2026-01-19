@@ -29,8 +29,8 @@ export const Home = observer((props: Props) => {
     function createNewProject (title: string, description: string) {
         ProjectService.createNewProject(title, description, store.user.id).then((id) => {
             navigate(`/project/${id}`);
-            store.notifications.push(new Notification("notification", "Projects was succesfully created."))
-        }).catch(e => store.notifications.push(new Notification("error", e.message)));
+            store.notifications.push(new Notification("notification", "Projects was succesfully created.", store.removeNotification.bind(store)))
+        }).catch(e => store.notifications.push(new Notification("error", e.message, store.removeNotification.bind(store))));
     }
 
     useEffect(() => {
@@ -38,7 +38,7 @@ export const Home = observer((props: Props) => {
             store.setLoading(true);
             store.checkAuth().then((res:boolean) => {
                 if (!res) {
-                    store.notifications.push(new Notification("error", "You must log in to get acces to this page"))
+                    store.notifications.push(new Notification("error", "You must log in to get acces to this page", store.removeNotification.bind(store)))
                     store.setLoading(false)
                     navigate("/")
                 }
@@ -46,7 +46,7 @@ export const Home = observer((props: Props) => {
                 () => ProjectService.getAllUserProjects(store.user.id).then(res => {
                     if (typeof res === "string")
                     {
-                        store.notifications.push(new Notification("error", res));
+                        store.notifications.push(new Notification("error", res, store.removeNotification.bind(store)));
                         setProjects([]);
                     } else 
                         setProjects(res)
@@ -54,7 +54,7 @@ export const Home = observer((props: Props) => {
             ).finally(() => store.setLoading(false));
         }
         else {
-            store.notifications.push(new Notification("error", "You must log in to get acces to this page"))
+            store.notifications.push(new Notification("error", "You must log in to get acces to this page", store.removeNotification.bind(store)))
             store.setLoading(false)
             navigate("/")
         }}, [])

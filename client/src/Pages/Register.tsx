@@ -40,18 +40,18 @@ export const Register = observer(() => {
             <Button onClick={async () => 
                 {
                     if (!validatePssword(password)) {
-                        store.notifications.push(new Notification("error", "Password must contain at least 8 chars, 1 uppercase letter, 1 lowercase letter and 1 digit"));
+                        store.notifications.push(new Notification("error", "Password must contain at least 8 chars, 1 uppercase letter, 1 lowercase letter and 1 digit", store.removeNotification.bind(store)));
                         return;
                     }
                     if (password !== repeatPassword) {
-                        store.notifications.push(new Notification("error", "Passwords don't match."));
+                        store.notifications.push(new Notification("error", "Passwords don't match.", store.removeNotification.bind(store)));
                         return;
                     }
                     try {
                         store.setLoading(true);
                         await store.register(email, password);
                     } catch (e: any) {
-                        store.notifications.push(new Notification("error", e.message));
+                        store.notifications.push(new Notification("error", e.message, store.removeNotification.bind(store)));
                     } finally {
                         store.setLoading(false);
                     }

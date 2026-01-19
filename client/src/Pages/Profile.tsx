@@ -33,7 +33,7 @@ export const Profile = observer(() => {
         if (localStorage.getItem("session")) 
             store.checkAuth().then((res:boolean) => {
                 if (!res) {
-                    store.notifications.push(new Notification("error", "You must log in to get acces to this page"))
+                    store.notifications.push(new Notification("error", "You must log in to get acces to this page", store.removeNotification.bind(store)))
                     store.setLoading(false);
                     navigate("/")
                 }
@@ -47,7 +47,7 @@ export const Profile = observer(() => {
                 }
             );
         else {
-            store.notifications.push(new Notification("error", "You must log in to get acces to this page"));
+            store.notifications.push(new Notification("error", "You must log in to get acces to this page", store.removeNotification.bind(store)));
             store.setLoading(false);
             navigate("/")
         }
@@ -108,9 +108,9 @@ export const Profile = observer(() => {
                 store.setLoading(true);
                 const res = await ProfileService.updateProfile(store.user.id, store.user.email, newStacks, newproflePicture, newUsername);
                 if (res) 
-                    store.notifications.push(new Notification("error", res));
+                    store.notifications.push(new Notification("error", res, store.removeNotification.bind(store)));
                 else 
-                    store.notifications.push(new Notification("notification", "Profile was updated"));
+                    store.notifications.push(new Notification("notification", "Profile was updated", store.removeNotification.bind(store)));
                 store.setLoading(false);
                 navigate("/home");
             }}>Save</Button>

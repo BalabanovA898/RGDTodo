@@ -37,10 +37,10 @@ export const CarouselItem = observer((props: Props) => {
         try {
             await ProjectService.deleteProject((props.item as any).id, store.user.id);
             props.setProjects(props.projects.filter(item => (item as any).id !== (props.item as any).id));
-            store.notifications.push(new Notification("notification", "Project had been succesfully deleted."));        
+            store.notifications.push(new Notification("notification", "Project had been succesfully deleted.", store.removeNotification.bind(store)));        
         } catch (e: any) {
             console.log(e)
-            store.notifications.push(new Notification("error", e.response.data));        
+            store.notifications.push(new Notification("error", e.response.data, store.removeNotification.bind(store)));        
         } 
     }
 
@@ -66,7 +66,7 @@ export const CarouselItem = observer((props: Props) => {
                 try {
                     await ProjectService.editProject((props.item as any).id, newTitle, newDescription, store.user.id);
                 } catch (e: any) {
-                    store.notifications.push(new Notification("error", e.response.data));        
+                    store.notifications.push(new Notification("error", e.response.data, store.removeNotification.bind(store)));        
                 }
                 setEditing(false);
             }}>Save</Button>
@@ -84,7 +84,7 @@ export const CarouselItem = observer((props: Props) => {
                 <button id="share-btn" className="carousel__item__controls__btn" onClick={() => 
                 {
                     navigator.clipboard.write([new ClipboardItem({["text/plain"]: `http://rgdtodo.onrender.com/share-link/${(props.item as any).id}`})])
-                    store.notifications.push(new Notification("notification", "Copied to clipboard."))
+                    store.notifications.push(new Notification("notification", "Copied to clipboard.", store.removeNotification.bind(store)))
                 }}>
                     <img className="carousel__item__controls__icon" src={share} alt="share" /></button>
                 <button id="delete-btn" className="carousel__item__controls__btn" onClick={deleteProject}>

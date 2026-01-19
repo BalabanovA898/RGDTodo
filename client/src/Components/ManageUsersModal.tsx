@@ -26,7 +26,7 @@ export const ManageUsersModal = observer((props: Props) => {
     async function moveUserFromAssigned(id: string) {
         const res = await TodosService.removeAssignToTodo(id, props?.todo?.id || "");
         if (res) {
-            store.notifications.push(new Notification("error", res));
+            store.notifications.push(new Notification("error", res, store.removeNotification.bind(store)));
             return
         }
         let todoCopy = props.todo;
@@ -47,7 +47,7 @@ export const ManageUsersModal = observer((props: Props) => {
     async function moveUserToAssigned(id: string) {
         const res = await TodosService.assignToTodo(id, props?.todo?.id || "");
         if (res) {
-            store.notifications.push(new Notification("error", res));
+            store.notifications.push(new Notification("error", res, store.removeNotification.bind(store)));
             return
         }
         let todoCopy = props.todo;

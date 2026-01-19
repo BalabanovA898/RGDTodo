@@ -38,7 +38,7 @@ export const Login = observer(() => {
                         if (store.isAuth)
                             navigate("/home");
                     } catch (e: any) {
-                        store.notifications.push(new Notification("error", e.message));
+                        store.notifications.push(new Notification("error", e.message, store.removeNotification.bind(store)));
                     } finally {
                         store.setLoading(false);
                     }

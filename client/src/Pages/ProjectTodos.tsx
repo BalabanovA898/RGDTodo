@@ -31,7 +31,7 @@ export const ProjectTodos = observer(() => {
             store.setLoading(true);
             store.checkAuth().then((res:boolean) => {
                 if (!res) {
-                    store.notifications.push(new Notification("error", "You must log in to get acces to this page"));
+                    store.notifications.push(new Notification("error", "You must log in to get acces to this page", store.removeNotification.bind(store)));
                     store.setLoading(false);
                     navigate("/")
                 }
@@ -40,14 +40,14 @@ export const ProjectTodos = observer(() => {
                     fetchTodos();
                     const res = await UserService.getProjectUsers(projectId || "");
                     if (typeof res === "string")
-                        store.notifications.push(new Notification("error", res));
+                        store.notifications.push(new Notification("error", res, store.removeNotification.bind(store)));
                     else
                         setProjectUsers(res.data);
                 }
             ).finally(() => store.setLoading(false));
         }
         else {
-            store.notifications.push(new Notification("error", "You must log in to get acces to this page"))
+            store.notifications.push(new Notification("error", "You must log in to get acces to this page", store.removeNotification.bind(store)))
             store.setLoading(false);
             navigate("/")
         }
@@ -57,7 +57,7 @@ export const ProjectTodos = observer(() => {
         if (projectId) {
             const res = await TodosService.getAllProjectTodos(projectId);
             if (typeof res === "string")
-                store.notifications.push(new Notification("error", res))
+                store.notifications.push(new Notification("error", res, store.removeNotification.bind(store)))
             else {
                 let todos = res?.data;
                 if (todos) {
@@ -99,7 +99,7 @@ export const ProjectTodos = observer(() => {
     async function editNode (newNode: Todo) {
         const res = await TodosService.updateTodo(newNode);
         if (res) {
-            store.notifications.push(new Notification("error", res));
+            store.notifications.push(new Notification("error", res, store.removeNotification.bind(store)));
             return;
         }
         let root_copy = root;
@@ -116,13 +116,13 @@ export const ProjectTodos = observer(() => {
             setRoot(root_copy);
         }
         else
-            store.notifications.push(new Notification("error", res[1])); 
+            store.notifications.push(new Notification("error", res[1], store.removeNotification.bind(store))); 
     }
 
     async function deleteTodo (id: string) {
         const res = await TodosService.deleteTodo(id);
         if (res) {
-            store.notifications.push(new Notification("error", res));
+            store.notifications.push(new Notification("error", res, store.removeNotification.bind(store)));
             return;
         }
         let root_copy = root;

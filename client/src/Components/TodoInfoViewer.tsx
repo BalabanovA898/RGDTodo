@@ -89,7 +89,7 @@ export const TodoInfoViewer = observer((props: Props) => {
                                     newNode.status="DONE"
                                     props.editNode(newNode);
                                 } else {
-                                    store.notifications.push(new Notification("error", "You must to do all sub task to do this one"));
+                                    store.notifications.push(new Notification("error", "You must to do all sub task to do this one", store.removeNotification.bind(store)));
                                 }
                             }
                         }}>DONE</p>
